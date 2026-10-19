@@ -1,49 +1,49 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlateShare - Smart Food Bridge</title>
     
-    <!-- Dynamic PWA Manifest via Blob URL for 100% working installability -->
+    <!-- Dynamic PWA Manifest via Blob URL for full installability -->
     <link rel="manifest" id="pwa-manifest">
-    <meta name="theme-color" content="#10b981">
+    <meta name="theme-color" content="#2e7d32">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary: #10b981; /* Vibrant Neon Green */
-            --primary-hover: #059669;
-            --accent: #f59e0b; /* Golden Yellow */
-            --accent-hover: #d97706;
-            --border-color: #334155;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-            --transition: all 0.25s ease;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --text-muted: #7f8c8d;
+            --primary: #2e7d32;
+            --primary-hover: #1b5e20;
+            --accent: #fbc02d;
+            --accent-hover: #f57f17;
+            --border-color: #e0e0e0;
+            --shadow: 0 8px 20px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
         }
 
-        [data-theme="light"] {
-            --bg-color: #f1f5f9;
-            --card-bg: #ffffff;
-            --text-color: #0f172a;
-            --text-muted: #64748b;
-            --primary: #059669;
-            --primary-hover: #047857;
-            --accent: #d97706;
-            --accent-hover: #b45309;
-            --border-color: #e2e8f0;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --primary: #4caf50;
+            --primary-hover: #81c784;
+            --accent: #ffb300;
+            --accent-hover: #ffd54f;
+            --border-color: #333333;
+            --shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             transition: var(--transition);
         }
 
@@ -67,14 +67,14 @@
             margin-bottom: 20px;
             background: var(--card-bg);
             padding: 12px 20px;
-            border-radius: 14px;
+            border-radius: 12px;
             box-shadow: var(--shadow);
             border: 1px solid var(--border-color);
         }
 
         .view-switcher {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
 
         .view-btn {
@@ -85,7 +85,7 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         .view-btn.active {
@@ -99,10 +99,9 @@
             gap: 15px;
         }
 
-        /* Install App Button */
         #install-btn {
-            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-            color: #0f172a;
+            background: var(--accent);
+            color: #212121;
             border: none;
             padding: 6px 12px;
             border-radius: 8px;
@@ -122,8 +121,8 @@
         .theme-switch {
             position: relative;
             display: inline-block;
-            width: 44px;
-            height: 24px;
+            width: 50px;
+            height: 26px;
         }
 
         .theme-switch input { opacity: 0; width: 0; height: 0; }
@@ -132,9 +131,9 @@
             position: absolute;
             cursor: pointer;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--border-color);
-            transition: .3s;
-            border-radius: 24px;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 26px;
         }
 
         .slider:before {
@@ -142,15 +141,15 @@
             content: "";
             height: 18px;
             width: 18px;
-            left: 3px;
-            bottom: 3px;
+            left: 4px;
+            bottom: 4px;
             background-color: white;
-            transition: .3s;
+            transition: .4s;
             border-radius: 50%;
         }
 
         input:checked + .slider { background-color: var(--primary); }
-        input:checked + .slider:before { transform: translateX(20px); }
+        input:checked + .slider:before { transform: translateX(24px); }
 
         /* Main Container */
         .container {
@@ -167,6 +166,9 @@
             color: var(--primary);
             font-size: 24px;
             margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .subtitle {
@@ -178,42 +180,42 @@
         .view-section { display: none; }
         .view-section.active { display: block; }
 
-        /* Action Buttons */
+        /* Buttons & Controls */
         .btn {
             background-color: var(--primary);
             color: white;
             border: none;
             padding: 16px 20px;
             font-size: 16px;
-            border-radius: 12px;
+            border-radius: 10px;
             width: 100%;
             cursor: pointer;
             margin-bottom: 15px;
             font-weight: bold;
-            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2);
         }
 
         .btn:hover { background-color: var(--primary-hover); }
 
         .btn-accent {
             background-color: var(--accent);
-            color: #0f172a;
-            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+            color: #212121;
+            box-shadow: 0 4px 10px rgba(251, 192, 45, 0.2);
         }
 
         .btn-accent:hover { background-color: var(--accent-hover); }
 
         .btn:disabled {
-            background-color: var(--border-color) !important;
-            color: var(--text-muted) !important;
+            background-color: #cccccc !important;
+            color: #666666 !important;
             cursor: not-allowed;
             box-shadow: none;
         }
 
         .info-box {
             margin-top: 20px;
-            padding: 16px;
-            border-radius: 12px;
+            padding: 15px;
+            border-radius: 10px;
             font-size: 14px;
             border: 1px solid var(--border-color);
             background: var(--bg-color);
@@ -222,18 +224,18 @@
         .gps-status {
             font-size: 13px;
             color: var(--text-muted);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
 
         /* Feed Cards */
         .request-card {
             background: var(--bg-color);
             border: 1px solid var(--border-color);
-            padding: 16px;
-            border-radius: 12px;
+            padding: 15px;
+            border-radius: 10px;
             margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
@@ -243,10 +245,7 @@
         .request-details h3 {
             font-size: 16px;
             color: var(--text-color);
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 4px;
         }
 
         .request-details p {
@@ -256,26 +255,23 @@
 
         .badge {
             background: var(--accent);
-            color: #0f172a;
-            padding: 2px 8px;
+            color: #212121;
+            padding: 4px 8px;
             border-radius: 6px;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
+            font-size: 11px;
+            font-weight: bold;
         }
 
         .empty-feed {
             text-align: center;
             color: var(--text-muted);
-            padding: 40px;
+            padding: 30px;
             font-size: 14px;
         }
 
         .timer-display {
             font-weight: bold;
             color: var(--accent);
-            font-family: monospace;
-            font-size: 16px;
         }
     </style>
 </head>
@@ -289,8 +285,9 @@
         <div class="controls-right">
             <button id="install-btn" onclick="installApp()">📲 Install App</button>
             <div class="theme-switch-wrapper">
+                <span style="font-size: 13px; color: var(--text-muted);">Dark Mode</span>
                 <label class="theme-switch">
-                    <input type="checkbox" id="theme-checkbox" onchange="toggleTheme()" checked>
+                    <input type="checkbox" id="theme-checkbox" onchange="toggleTheme()">
                     <span class="slider"></span>
                 </label>
             </div>
@@ -302,26 +299,26 @@
         <!-- ================= KIOSK VIEW ================= -->
         <div id="kiosk-view" class="view-section active">
             <h1>PlateShare Street Kiosk</h1>
-            <p class="subtitle">Tap below to instantly alert nearby food donors & hotels</p>
+            <p class="subtitle">Instant food assistance point for citizens in need</p>
 
             <div class="gps-status" id="gps-status">
-                📍 Acquiring precise real-time GPS coordinates...
+                📍 Fetching precise real-time GPS location...
             </div>
 
             <button class="btn" id="btn-single" onclick="requestFood('Single Meal')">🍽️ Request Single Meal</button>
             <button class="btn btn-accent" id="btn-family" onclick="requestFood('Family Pack')">👨‍👩‍👧 Request Family Pack</button>
 
             <div class="info-box" id="kiosk-status-box" style="display: none;">
-                <strong>Request Broadcasted!</strong><br>
-                Status: <span id="req-status-text">Notifying nearest restaurant partners...</span><br>
-                Cooldown Active: <span id="timer-display" class="timer-display">02:00</span>
+                <strong>Request Active!</strong><br>
+                Status: <span id="req-status-text">Notifying nearby hotels...</span><br>
+                Cooldown Timer: <span id="timer-display" class="timer-display">02:00</span>
             </div>
         </div>
 
         <!-- ================= DONOR VIEW ================= -->
         <div id="donor-view" class="view-section">
             <h1>Hotel & NGO Donor Portal</h1>
-            <p class="subtitle">Live queue of active street requests requiring surplus food dispatch</p>
+            <p class="subtitle">Live active street requests awaiting fresh surplus food</p>
 
             <div id="donor-feed">
                 <div class="empty-feed">No active street requests at the moment.</div>
@@ -331,14 +328,14 @@
     </div>
 
     <script>
-        // Real PWA Blob Manifest setup for native install prompt
+        // Dynamic PWA Manifest via Blob URL
         const manifestData = {
             name: "PlateShare Street Hub",
             short_name: "PlateShare",
             start_url: window.location.href,
             display: "standalone",
-            background_color: "#0f172a",
-            theme_color: "#10b981",
+            background_color: "#f4f7f6",
+            theme_color: "#2e7d32",
             icons: [{
                 src: "https://img.icons8.com/color/192/000000/meal.png",
                 sizes: "192x192",
@@ -367,14 +364,13 @@
             }
         }
 
-        // Real-time synchronization channel across browser tabs / devices
         const channel = new BroadcastChannel('plateshare_sync');
-        let currentGPS = { lat: "12.9716", lng: "77.5946" }; // Default fallback
+        let currentGPS = { lat: "12.9716", lng: "77.5946" };
         let activeRequests = JSON.parse(localStorage.getItem('plateshare_requests')) || [];
         let cooldownTimerInterval = null;
 
         window.onload = function() {
-            const savedTheme = localStorage.getItem('plateshare_theme') || 'dark';
+            const savedTheme = localStorage.getItem('plateshare_theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
             document.getElementById('theme-checkbox').checked = (savedTheme === 'dark');
 
@@ -392,15 +388,15 @@
                             lat: position.coords.latitude.toFixed(4),
                             lng: position.coords.longitude.toFixed(4)
                         };
-                        gpsElement.innerHTML = `📍 Live GPS Fixed: ${currentGPS.lat}° N, ${currentGPS.lng}° E`;
+                        gpsElement.innerHTML = `📍 Live GPS Locked: ${currentGPS.lat}° N, ${currentGPS.lng}° E`;
                     },
                     (error) => {
-                        gpsElement.innerHTML = `📍 GPS Fallback Active (Using Default Region)`;
+                        gpsElement.innerHTML = `📍 GPS Fallback Active (Default Location)`;
                     },
-                    { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             } else {
-                gpsElement.innerHTML = `📍 Geolocation not supported by this browser.`;
+                gpsElement.innerHTML = `📍 Geolocation not supported by browser.`;
             }
         }
 
@@ -440,7 +436,7 @@
             localStorage.setItem('plateshare_requests', JSON.stringify(activeRequests));
             channel.postMessage({ action: 'sync_update' });
 
-            localStorage.setItem('plateshare_cooldown_end', Date.now() + 120000); // 2 mins cooldown
+            localStorage.setItem('plateshare_cooldown_end', Date.now() + 120000);
             startCooldown(120);
 
             showKioskActiveState(type);
@@ -449,7 +445,7 @@
 
         function showKioskActiveState(type) {
             document.getElementById('kiosk-status-box').style.display = 'block';
-            document.getElementById('req-status-text').innerText = `${type} requested. Donor dispatch en route!`;
+            document.getElementById('req-status-text').innerText = `${type} requested successfully. Donor dispatched!`;
             document.getElementById('btn-single').disabled = true;
             document.getElementById('btn-family').disabled = true;
         }
@@ -507,8 +503,8 @@
                     <div class="request-card">
                         <div class="request-details">
                             <h3>${req.type} <span class="badge">LIVE</span></h3>
-                            <p>📍 GPS Coordinates: ${req.lat}, ${req.lng}</p>
-                            <p>🕒 Time: ${req.time}</p>
+                            <p>📍 Location: ${req.lat}, ${req.lng}</p>
+                            <p>🕒 Requested at: ${req.time}</p>
                         </div>
                         <button class="view-btn" style="background:var(--primary); color:white;" onclick="fulfillRequest('${req.id}')">Accept & Deliver</button>
                     </div>
