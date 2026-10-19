@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlateShare - Smart Food Bridge</title>
     
-    <!-- Dynamic PWA Manifest via Blob URL for full installability -->
+    <!-- PWA Manifest with Green Theme -->
     <link rel="manifest" id="pwa-manifest">
     <meta name="theme-color" content="#2e7d32">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -174,13 +174,64 @@
         .subtitle {
             color: var(--text-muted);
             font-size: 14px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .view-section { display: none; }
         .view-section.active { display: block; }
 
-        /* Buttons & Controls */
+        /* Stats Dashboard Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 22px;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-card p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-color);
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        /* Action Buttons */
         .btn {
             background-color: var(--primary);
             color: white;
@@ -301,16 +352,36 @@
             <h1>PlateShare Street Kiosk</h1>
             <p class="subtitle">Instant food assistance point for citizens in need</p>
 
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <h3 id="stat-meals-saved">0</h3>
+                    <p>Meals Delivered Today</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-active-kiosks">12</h3>
+                    <p>Active Kiosks Online</p>
+                </div>
+            </div>
+
             <div class="gps-status" id="gps-status">
                 📍 Fetching precise real-time GPS location...
             </div>
 
-            <button class="btn" id="btn-single" onclick="requestFood('Single Meal')">🍽️ Request Single Meal</button>
-            <button class="btn btn-accent" id="btn-family" onclick="requestFood('Family Pack')">👨‍👩‍👧 Request Family Pack</button>
+            <div class="form-group">
+                <label>Select Meal / Dietary Preference</label>
+                <select id="meal-preference">
+                    <option value="Standard Veg Pack">🌿 Standard Veg Pack</option>
+                    <option value="Standard Non-Veg Pack">🍗 Standard Non-Veg Pack</option>
+                    <option value="Child / Baby Nutrition Pack">🍼 Child / Baby Nutrition Pack</option>
+                </select>
+            </div>
+
+            <button class="btn" id="btn-request" onclick="requestFood()">🍽️ Send Meal Request to Nearby Hotels</button>
 
             <div class="info-box" id="kiosk-status-box" style="display: none;">
                 <strong>Request Active!</strong><br>
-                Status: <span id="req-status-text">Notifying nearby hotels...</span><br>
+                Status: <span id="req-status-text">Notifying nearby hotels & volunteers...</span><br>
                 Cooldown Timer: <span id="timer-display" class="timer-display">02:00</span>
             </div>
         </div>
@@ -328,13 +399,13 @@
     </div>
 
     <script>
-        // Dynamic PWA Manifest via Blob URL
+        // Dynamic PWA Manifest with Green Theme Icon
         const manifestData = {
             name: "PlateShare Street Hub",
             short_name: "PlateShare",
             start_url: window.location.href,
             display: "standalone",
-            background_color: "#f4f7f6",
+            background_color: "#2e7d32",
             theme_color: "#2e7d32",
             icons: [{
                 src: "https://img.icons8.com/color/192/000000/meal.png",
@@ -367,12 +438,15 @@
         const channel = new BroadcastChannel('plateshare_sync');
         let currentGPS = { lat: "12.9716", lng: "77.5946" };
         let activeRequests = JSON.parse(localStorage.getItem('plateshare_requests')) || [];
+        let totalDelivered = parseInt(localStorage.getItem('plateshare_delivered')) || 28;
         let cooldownTimerInterval = null;
 
         window.onload = function() {
             const savedTheme = localStorage.getItem('plateshare_theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
             document.getElementById('theme-checkbox').checked = (savedTheme === 'dark');
+
+            document.getElementById('stat-meals-saved').innerText = totalDelivered;
 
             initRealGPS();
             checkActiveCooldown();
@@ -421,11 +495,12 @@
             }
         }
 
-        function requestFood(type) {
+        function requestFood() {
+            const mealType = document.getElementById('meal-preference').value;
             const requestId = 'REQ_' + Date.now();
             const requestData = {
                 id: requestId,
-                type: type,
+                type: mealType,
                 lat: currentGPS.lat,
                 lng: currentGPS.lng,
                 time: new Date().toLocaleTimeString(),
@@ -439,15 +514,14 @@
             localStorage.setItem('plateshare_cooldown_end', Date.now() + 120000);
             startCooldown(120);
 
-            showKioskActiveState(type);
+            showKioskActiveState(mealType);
             renderDonorFeed();
         }
 
         function showKioskActiveState(type) {
             document.getElementById('kiosk-status-box').style.display = 'block';
             document.getElementById('req-status-text').innerText = `${type} requested successfully. Donor dispatched!`;
-            document.getElementById('btn-single').disabled = true;
-            document.getElementById('btn-family').disabled = true;
+            document.getElementById('btn-request').disabled = true;
         }
 
         function startCooldown(durationInSeconds) {
@@ -455,8 +529,7 @@
             const timerDisplay = document.getElementById('timer-display');
             if (cooldownTimerInterval) clearInterval(cooldownTimerInterval);
 
-            document.getElementById('btn-single').disabled = true;
-            document.getElementById('btn-family').disabled = true;
+            document.getElementById('btn-request').disabled = true;
             document.getElementById('kiosk-status-box').style.display = 'block';
 
             cooldownTimerInterval = setInterval(() => {
@@ -468,8 +541,7 @@
                 if (remaining <= 0) {
                     clearInterval(cooldownTimerInterval);
                     localStorage.removeItem('plateshare_cooldown_end');
-                    document.getElementById('btn-single').disabled = false;
-                    document.getElementById('btn-family').disabled = false;
+                    document.getElementById('btn-request').disabled = false;
                     document.getElementById('kiosk-status-box').style.display = 'none';
                 }
             }, 1000);
@@ -516,11 +588,18 @@
         function fulfillRequest(id) {
             activeRequests = activeRequests.filter(r => r.id !== id);
             localStorage.setItem('plateshare_requests', JSON.stringify(activeRequests));
+            
+            totalDelivered++;
+            localStorage.setItem('plateshare_delivered', totalDelivered);
+            document.getElementById('stat-meals-saved').innerText = totalDelivered;
+
             channel.postMessage({ action: 'sync_update' });
             renderDonorFeed();
         }
 
         channel.onmessage = function () {
+            totalDelivered = parseInt(localStorage.getItem('plateshare_delivered')) || 28;
+            document.getElementById('stat-meals-saved').innerText = totalDelivered;
             renderDonorFeed();
         };
     </script>
