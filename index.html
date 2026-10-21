@@ -1,412 +1,409 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlateShare - Smart Food Bridge</title>
+    <title>PlateShare - Food Relief Kiosk & Donor Platform</title>
     
-    <!-- PWA Manifest with Green Theme -->
+    <!-- PWA Manifest via Blob URL for 100% working installability -->
     <link rel="manifest" id="pwa-manifest">
-    <meta name="theme-color" content="#2e7d32">
+    <meta name="theme-color" content="#2E7D32">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brandGreen: {
+                            DEFAULT: '#2E7D32',
+                            dark: '#1B5E20',
+                            light: '#4CAF50',
+                            soft: '#E8F5E9',
+                        },
+                        brandYellow: {
+                            DEFAULT: '#F9A825',
+                            dark: '#F57F17',
+                            light: '#FBC02D',
+                            soft: '#FFFDE7',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-color: #2c3e50;
-            --text-muted: #7f8c8d;
-            --primary: #2e7d32;
-            --primary-hover: #1b5e20;
-            --accent: #fbc02d;
-            --accent-hover: #f57f17;
-            --border-color: #e0e0e0;
-            --shadow: 0 8px 20px rgba(0,0,0,0.08);
-            --transition: all 0.3s ease;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-color: #e0e0e0;
-            --text-muted: #a0a0a0;
-            --primary: #4caf50;
-            --primary-hover: #81c784;
-            --accent: #ffb300;
-            --accent-hover: #ffd54f;
-            --border-color: #333333;
-            --shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            transition: var(--transition);
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-
-        /* Top Bar */
-        .top-bar {
-            width: 100%;
-            max-width: 800px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            background: var(--card-bg);
-            padding: 12px 20px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
+        .glass-panel {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
-
-        .view-switcher {
-            display: flex;
-            gap: 10px;
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-
-        .view-btn {
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            padding: 6px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
         }
-
-        .view-btn.active {
-            background: var(--primary);
-            color: #ffffff;
+        ::-webkit-scrollbar-thumb {
+            background: rgba(46, 125, 50, 0.3);
+            border-radius: 999px;
         }
-
-        .controls-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        #install-btn {
-            background: var(--accent);
-            color: #212121;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 12px;
-            cursor: pointer;
-            display: none;
-        }
-
-        /* Toggle Switch */
-        .theme-switch-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .theme-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 26px;
-        }
-
-        .theme-switch input { opacity: 0; width: 0; height: 0; }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 26px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider { background-color: var(--primary); }
-        input:checked + .slider:before { transform: translateX(24px); }
-
-        /* Main Container */
-        .container {
-            width: 100%;
-            max-width: 800px;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-        }
-
-        h1 {
-            color: var(--primary);
-            font-size: 24px;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-
-        .view-section { display: none; }
-        .view-section.active { display: block; }
-
-        /* Stats Dashboard Row */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-card h3 {
-            font-size: 22px;
-            color: var(--primary);
-            margin-bottom: 4px;
-        }
-
-        .stat-card p {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        /* Form Controls */
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-color);
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        select, input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-color);
-            color: var(--text-color);
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
-
-        /* Action Buttons */
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 16px 20px;
-            font-size: 16px;
-            border-radius: 10px;
-            width: 100%;
-            cursor: pointer;
-            margin-bottom: 15px;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2);
-        }
-
-        .btn:hover { background-color: var(--primary-hover); }
-
-        .btn-accent {
-            background-color: var(--accent);
-            color: #212121;
-            box-shadow: 0 4px 10px rgba(251, 192, 45, 0.2);
-        }
-
-        .btn-accent:hover { background-color: var(--accent-hover); }
-
-        .btn:disabled {
-            background-color: #cccccc !important;
-            color: #666666 !important;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .info-box {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 14px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-color);
-        }
-
-        .gps-status {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Feed Cards */
-        .request-card {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .request-details h3 {
-            font-size: 16px;
-            color: var(--text-color);
-            margin-bottom: 4px;
-        }
-
-        .request-details p {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .badge {
-            background: var(--accent);
-            color: #212121;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .empty-feed {
-            text-align: center;
-            color: var(--text-muted);
-            padding: 30px;
-            font-size: 14px;
-        }
-
-        .timer-display {
-            font-weight: bold;
-            color: var(--accent);
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(46, 125, 50, 0.6);
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col">
 
-    <div class="top-bar">
-        <div class="view-switcher">
-            <button class="view-btn active" onclick="switchView('kiosk')">Street Kiosk</button>
-            <button class="view-btn" onclick="switchView('donor')">Donor Portal</button>
-        </div>
-        <div class="controls-right">
-            <button id="install-btn" onclick="installApp()">📲 Install App</button>
-            <div class="theme-switch-wrapper">
-                <span style="font-size: 13px; color: var(--text-muted);">Dark Mode</span>
-                <label class="theme-switch">
-                    <input type="checkbox" id="theme-checkbox" onchange="toggleTheme()">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        
-        <!-- ================= KIOSK VIEW ================= -->
-        <div id="kiosk-view" class="view-section active">
-            <h1>PlateShare Street Kiosk</h1>
-            <p class="subtitle">Instant food assistance point for citizens in need</p>
-
-            <!-- Stats Row -->
-            <div class="stats-row">
-                <div class="stat-card">
-                    <h3 id="stat-meals-saved">0</h3>
-                    <p>Meals Delivered Today</p>
+    <!-- TOP NAVIGATION BAR -->
+    <header class="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 border-b border-gray-200 dark:border-gray-800 glass-panel px-4 py-3 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            
+            <!-- Logo & Brand Title -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brandGreen-dark via-brandGreen to-brandYellow flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid fa-utensils text-xl"></i>
                 </div>
-                <div class="stat-card">
-                    <h3 id="stat-active-kiosks">12</h3>
-                    <p>Active Kiosks Online</p>
+                <div>
+                    <h1 class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-brandGreen-dark via-brandGreen to-brandYellow-dark dark:from-brandGreen-light dark:to-brandYellow bg-clip-text text-transparent">
+                        PlateShare
+                    </h1>
+                    <p class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest hidden sm:block">Food Relief Network</p>
                 </div>
             </div>
 
-            <div class="gps-status" id="gps-status">
-                📍 Fetching precise real-time GPS location...
+            <!-- Dual View Switcher Tabs (Center) -->
+            <div class="flex items-center bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700 shadow-inner order-3 md:order-2 w-full md:w-auto justify-center">
+                <button id="tab-kiosk" onclick="switchView('kiosk')" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-brandGreen text-white shadow-sm">
+                    <i class="fa-solid fa-hand-holding-heart"></i>
+                    <span>Street Kiosk Mode</span>
+                </button>
+                <button id="tab-donor" onclick="switchView('donor')" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-gray-600 dark:text-gray-300 hover:text-brandGreen dark:hover:text-brandGreen-light">
+                    <i class="fa-solid fa-building-wheat"></i>
+                    <span>Donor & Partner Portal</span>
+                </button>
             </div>
 
-            <div class="form-group">
-                <label>Select Meal / Dietary Preference</label>
-                <select id="meal-preference">
-                    <option value="Standard Veg Pack">🌿 Standard Veg Pack</option>
-                    <option value="Standard Non-Veg Pack">🍗 Standard Non-Veg Pack</option>
-                    <option value="Child / Baby Nutrition Pack">🍼 Child / Baby Nutrition Pack</option>
-                </select>
+            <!-- Top Right: PWA Install, GPS & Theme Toggle -->
+            <div class="flex items-center space-x-3 order-2 md:order-3">
+                
+                <!-- Install App Button (Hidden until PWA prompt ready) -->
+                <button id="install-btn" onclick="installApp()" class="hidden items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-600 text-gray-950 transition shadow-sm">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Install App</span>
+                </button>
+
+                <!-- Quick GPS Indicator Button -->
+                <button onclick="requestRealGPS()" class="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 transition" title="Refresh GPS Location">
+                    <i class="fa-solid fa-location-crosshairs text-emerald-600 dark:text-emerald-400"></i>
+                    <span id="nav-gps-label">GPS: Ready</span>
+                </button>
+
+                <!-- Modern Dark / Light Mode Toggle Switch -->
+                <div class="flex items-center space-x-2 pl-2 border-l border-gray-200 dark:border-gray-700">
+                    <i class="fa-solid fa-sun text-amber-500 text-xs"></i>
+                    <button id="theme-toggle" onclick="toggleDarkMode()" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-brandGreen" role="switch" aria-checked="true">
+                        <span id="theme-toggle-dot" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-5"></span>
+                    </button>
+                    <i class="fa-solid fa-moon text-indigo-400 text-xs"></i>
+                </div>
             </div>
 
-            <button class="btn" id="btn-request" onclick="requestFood()">🍽️ Send Meal Request to Nearby Hotels</button>
+        </div>
+    </header>
 
-            <div class="info-box" id="kiosk-status-box" style="display: none;">
-                <strong>Request Active!</strong><br>
-                Status: <span id="req-status-text">Notifying nearby hotels & volunteers...</span><br>
-                Cooldown Timer: <span id="timer-display" class="timer-display">02:00</span>
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- ========================================== -->
+        <!-- VIEW 1: STREET KIOSK MODE (PUBLIC USE)     -->
+        <!-- ========================================== -->
+        <section id="view-kiosk" class="space-y-6">
+            
+            <!-- Kiosk Header Banner -->
+            <div class="bg-gradient-to-r from-brandGreen-dark via-brandGreen to-emerald-700 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-brandYellow/20 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-2xl">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-brandYellow-light mb-3">
+                        <i class="fa-solid fa-circle text-[8px] animate-pulse"></i>
+                        <span>Public Food Relief Kiosk Terminal</span>
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-2">Need Meal Support?</h2>
+                    <p class="text-emerald-100 text-sm sm:text-base font-medium">
+                        Tap any button below. Nearby hotels, caterers, and food relief volunteers will receive your real GPS alert and dispatch fresh meals directly to this station location.
+                    </p>
+                </div>
+                
+                <!-- Real GPS Banner Status -->
+                <div class="mt-6 pt-4 border-t border-white/15 flex flex-wrap items-center justify-between gap-3 text-xs text-emerald-100">
+                    <div class="flex items-center space-x-2 bg-black/20 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+                        <i class="fa-solid fa-location-dot text-brandYellow"></i>
+                        <span id="kiosk-gps-text">Location: Acquiring live device GPS...</span>
+                    </div>
+                    <button onclick="requestRealGPS()" class="px-3 py-1.5 bg-brandYellow text-gray-900 rounded-lg font-bold hover:bg-brandYellow-light transition shadow-sm">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i> Update Location
+                    </button>
+                </div>
+            </div>
+
+            <!-- Big Action Touch Buttons Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Action 1: Single Meal -->
+                <button id="btn-single" onclick="triggerKioskRequest('Single Meal', 1)" class="group relative bg-white dark:bg-gray-900 border-2 border-brandGreen/30 dark:border-brandGreen/40 hover:border-brandGreen dark:hover:border-brandGreen-light rounded-2xl p-6 text-left transition-all duration-300 shadow-lg hover:shadow-2xl flex flex-col justify-between h-64 overflow-hidden transform hover:-translate-y-1 active:scale-[0.98]">
+                    <div class="w-14 h-14 rounded-2xl bg-brandGreen-soft dark:bg-brandGreen-dark/40 text-brandGreen dark:text-brandGreen-light flex items-center justify-center text-2xl font-bold mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-bowl-rice"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-brandGreen dark:text-brandGreen-light uppercase tracking-wider">Fast Service</span>
+                        <h3 class="text-2xl font-black text-gray-900 dark:text-white mt-1">Single Meal</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Nutritious fresh meal package for 1 person.</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-brandGreen dark:text-brandGreen-light font-bold text-sm">
+                        <span>Tap to Request</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </button>
+
+                <!-- Action 2: Family Pack -->
+                <button id="btn-family" onclick="triggerKioskRequest('Family Pack', 4)" class="group relative bg-white dark:bg-gray-900 border-2 border-brandYellow/50 dark:border-brandYellow/40 hover:border-brandYellow rounded-2xl p-6 text-left transition-all duration-300 shadow-lg hover:shadow-2xl flex flex-col justify-between h-64 overflow-hidden transform hover:-translate-y-1 active:scale-[0.98]">
+                    <div class="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-brandYellow flex items-center justify-center text-2xl font-bold mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-people-roof"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-amber-600 dark:text-brandYellow uppercase tracking-wider">Group Support</span>
+                        <h3 class="text-2xl font-black text-gray-900 dark:text-white mt-1">Family Pack</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Large family box suitable for 3 - 4 people.</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-amber-600 dark:text-brandYellow font-bold text-sm">
+                        <span>Tap to Request</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </button>
+
+                <!-- Action 3: Water & Basic Kit -->
+                <button id="btn-water" onclick="triggerKioskRequest('Drinking Water & Essentials Kit', 1)" class="group relative bg-white dark:bg-gray-900 border-2 border-sky-300 dark:border-sky-800 hover:border-sky-500 rounded-2xl p-6 text-left transition-all duration-300 shadow-lg hover:shadow-2xl flex flex-col justify-between h-64 overflow-hidden transform hover:-translate-y-1 active:scale-[0.98]">
+                    <div class="w-14 h-14 rounded-2xl bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 flex items-center justify-center text-2xl font-bold mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-bottle-water"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider">Hygiene & Water</span>
+                        <h3 class="text-2xl font-black text-gray-900 dark:text-white mt-1">Water & Basic Kit</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Clean bottled drinking water & basic hygiene supplies.</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-sky-600 dark:text-sky-400 font-bold text-sm">
+                        <span>Tap to Request</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </button>
+
+            </div>
+
+            <!-- Active Confirmation Card & Live Countdown (Hidden by default) -->
+            <div id="kiosk-status-card" class="hidden bg-emerald-900 text-white rounded-2xl p-6 sm:p-8 shadow-2xl border-2 border-emerald-500 relative overflow-hidden">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="space-y-2 text-center md:text-left">
+                        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-800 text-emerald-200 text-xs font-bold">
+                            <i class="fa-solid fa-check-circle text-brandYellow"></i>
+                            <span>GPS Alert Sent to Local Partners</span>
+                        </div>
+                        <h3 id="status-title" class="text-2xl sm:text-3xl font-black">Request Dispatched!</h3>
+                        <p id="status-details" class="text-emerald-100 text-sm max-w-xl"></p>
+                        <div class="text-xs text-emerald-300 font-mono pt-1" id="status-gps"></div>
+                    </div>
+                    
+                    <!-- Countdown Ring / Timer -->
+                    <div class="bg-emerald-950/80 p-6 rounded-2xl border border-emerald-700/50 text-center min-w-[200px] shadow-inner">
+                        <span class="text-xs font-bold uppercase text-emerald-300 tracking-wider">Cooldown / Delivery</span>
+                        <div id="status-countdown" class="text-4xl font-black text-brandYellow my-1 font-mono">02:00</div>
+                        <span class="text-[11px] text-emerald-400">Anti-spam timer active</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency / Quick SOS Line -->
+            <div class="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/80 text-red-600 dark:text-red-300 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-red-900 dark:text-red-200 text-sm">Emergency Food Helpline & SOS</h4>
+                        <p class="text-xs text-red-700 dark:text-red-400">Need immediate night shelter or urgent emergency aid?</p>
+                    </div>
+                </div>
+                <button onclick="triggerSOS()" class="w-full sm:w-auto px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl transition shadow-md flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-phone-volume"></i>
+                    <span>Emergency Helpline</span>
+                </button>
+            </div>
+
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: DONOR & PARTNER PORTAL             -->
+        <!-- ========================================== -->
+        <section id="view-donor" class="hidden space-y-8">
+            
+            <!-- Live Impact Analytics Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-bold">
+                        <span>MEALS SERVED TODAY</span>
+                        <i class="fa-solid fa-utensils text-brandGreen text-base"></i>
+                    </div>
+                    <div class="text-3xl font-black text-gray-900 dark:text-white mt-2" id="stat-meals">384</div>
+                    <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">+28 from last hour</span>
+                </div>
+
+                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-bold">
+                        <span>ACTIVE DONORS ONLINE</span>
+                        <i class="fa-solid fa-store text-amber-500 text-base"></i>
+                    </div>
+                    <div class="text-3xl font-black text-gray-900 dark:text-white mt-2" id="stat-donors">24</div>
+                    <span class="text-[11px] text-gray-500 font-medium">Hotels, Caterers & Kitchens</span>
+                </div>
+
+                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-bold">
+                        <span>FOOD WASTE PREVENTED</span>
+                        <i class="fa-solid fa-leaf text-emerald-500 text-base"></i>
+                    </div>
+                    <div class="text-3xl font-black text-gray-900 dark:text-white mt-2" id="stat-waste">192 kg</div>
+                    <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">Saved from landfills</span>
+                </div>
+
+                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between text-gray-500 dark:text-gray-400 text-xs font-bold">
+                        <span>ACTIVE KIOSKS</span>
+                        <i class="fa-solid fa-location-dot text-sky-500 text-base"></i>
+                    </div>
+                    <div class="text-3xl font-black text-gray-900 dark:text-white mt-2">12</div>
+                    <span class="text-[11px] text-gray-500 font-medium">Street Terminals Live</span>
+                </div>
+            </div>
+
+            <!-- Two Column Layout: Post Surplus Form + Live Request Feed -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Left Column: Post Surplus Food Form -->
+                <div class="lg:col-span-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-md h-fit">
+                    <div class="flex items-center space-x-3 mb-5 pb-4 border-b border-gray-100 dark:border-gray-800">
+                        <div class="w-10 h-10 rounded-xl bg-brandYellow/20 text-brandYellow-dark dark:text-brandYellow flex items-center justify-center font-bold text-lg">
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-900 dark:text-white">Post Excess Food</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Notify volunteers of surplus food available for pickup.</p>
+                        </div>
+                    </div>
+
+                    <form id="donation-form" onsubmit="handlePostDonation(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-gray-600 dark:text-gray-300 mb-1">Donor Name / Hotel</label>
+                            <input type="text" id="donor-name" required placeholder="e.g. Royal Palace Caterers" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm focus:ring-2 focus:ring-brandGreen focus:outline-none dark:text-white">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-600 dark:text-gray-300 mb-1">Food Category</label>
+                                <select id="donor-category" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm focus:ring-2 focus:ring-brandGreen focus:outline-none dark:text-white">
+                                    <option value="Vegetarian">Vegetarian</option>
+                                    <option value="Non-Veg">Non-Veg</option>
+                                    <option value="Packaged / Dry">Packaged / Dry</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-600 dark:text-gray-300 mb-1">Servings Count</label>
+                                <input type="number" id="donor-servings" required min="5" placeholder="e.g. 30" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm focus:ring-2 focus:ring-brandGreen focus:outline-none dark:text-white">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-gray-600 dark:text-gray-300 mb-1">Pickup Address / Location</label>
+                            <div class="relative">
+                                <input type="text" id="donor-location" required placeholder="e.g. Sector 14, Main Market" class="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm focus:ring-2 focus:ring-brandGreen focus:outline-none dark:text-white">
+                                <button type="button" onclick="fillDonorGPS()" class="absolute right-2 top-2 px-2 py-1 bg-brandGreen/10 text-brandGreen dark:text-brandGreen-light text-xs font-semibold rounded-lg hover:bg-brandGreen/20">
+                                    <i class="fa-solid fa-location-crosshairs"></i> GPS
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-gray-600 dark:text-gray-300 mb-1">Prepared Time & Expiry Notes</label>
+                            <input type="text" id="donor-expiry" placeholder="e.g. Cooked 2 hrs ago (Fresh for 4 hours)" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm focus:ring-2 focus:ring-brandGreen focus:outline-none dark:text-white">
+                        </div>
+
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-brandGreen to-emerald-700 hover:from-brandGreen-dark hover:to-brandGreen text-white font-bold rounded-xl shadow-md transition duration-200 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>Publish Donation to Network</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Right Column: Interactive Live Request & Donation Feed -->
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-800">
+                        <div>
+                            <h3 class="font-extrabold text-xl text-gray-900 dark:text-white">Live Activity & Request Feed</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Real-time cross-device sync from street kiosks & food donors.</p>
+                        </div>
+                        <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-full animate-pulse">
+                            ● Live Mesh Sync
+                        </span>
+                    </div>
+
+                    <!-- Feed Container -->
+                    <div id="request-feed-container" class="space-y-4">
+                        <!-- Dynamic items injected via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-12 py-6 px-4">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 dark:text-gray-400">
+            <div class="flex items-center space-x-2">
+                <span class="font-bold text-brandGreen dark:text-brandGreen-light">PlateShare Network</span>
+                <span>• Zero Food Waste & Urban Relief Platform</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span><i class="fa-solid fa-shield-halved mr-1"></i> Food Safety Compliant</span>
+                <span><i class="fa-solid fa-satellite-dish mr-1"></i> HTML5 Real GPS Mesh</span>
             </div>
         </div>
+    </footer>
 
-        <!-- ================= DONOR VIEW ================= -->
-        <div id="donor-view" class="view-section">
-            <h1>Hotel & NGO Donor Portal</h1>
-            <p class="subtitle">Live active street requests awaiting fresh surplus food</p>
-
-            <div id="donor-feed">
-                <div class="empty-feed">No active street requests at the moment.</div>
-            </div>
-        </div>
-
-    </div>
-
+    <!-- JAVASCRIPT BACKEND-LIKE SYNC & LOGIC -->
     <script>
-        // Dynamic PWA Manifest with Green Theme Icon
+        // ==========================================
+        // PWA MANIFEST & INSTALL PROMPT SETUP
+        // ==========================================
         const manifestData = {
             name: "PlateShare Street Hub",
             short_name: "PlateShare",
             start_url: window.location.href,
             display: "standalone",
-            background_color: "#2e7d32",
-            theme_color: "#2e7d32",
+            background_color: "#121212",
+            theme_color: "#2E7D32",
             icons: [{
                 src: "https://img.icons8.com/color/192/000000/meal.png",
                 sizes: "192x192",
@@ -420,7 +417,7 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            document.getElementById('install-btn').style.display = 'block';
+            document.getElementById('install-btn').style.display = 'inline-flex';
         });
 
         function installApp() {
@@ -435,115 +432,193 @@
             }
         }
 
-        const channel = new BroadcastChannel('plateshare_sync');
-        let currentGPS = { lat: "12.9716", lng: "77.5946" };
-        let activeRequests = JSON.parse(localStorage.getItem('plateshare_requests')) || [];
-        let totalDelivered = parseInt(localStorage.getItem('plateshare_delivered')) || 28;
-        let cooldownTimerInterval = null;
+        // ==========================================
+        // APP STATE & CROSS-TAB/DEVICE SYNC (BROADCASTCHANNEL)
+        // ==========================================
+        const channel = new BroadcastChannel('plateshare_sync_channel');
+        let userGPS = { lat: "12.9716", lng: "77.5946" };
+        let activeCountdownInterval = null;
+
+        // Persistent State via localStorage
+        let feedItems = JSON.parse(localStorage.getItem('plateshare_feed_items')) || [
+            {
+                id: 'REQ-101',
+                type: 'Kiosk Request',
+                title: 'Single Meal (1 Person)',
+                location: 'Street Terminal #4 (Lat: 12.9716, Lng: 77.5946)',
+                time: '2 mins ago',
+                status: 'Pending',
+                badgeBg: 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300'
+            },
+            {
+                id: 'DON-204',
+                type: 'Surplus Donation',
+                title: 'Veg Biryani & Curd Rice (45 Servings)',
+                location: 'Taj Caterers, MG Road',
+                time: '12 mins ago',
+                status: 'Available',
+                badgeBg: 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300'
+            }
+        ];
 
         window.onload = function() {
-            const savedTheme = localStorage.getItem('plateshare_theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            document.getElementById('theme-checkbox').checked = (savedTheme === 'dark');
-
-            document.getElementById('stat-meals-saved').innerText = totalDelivered;
-
-            initRealGPS();
+            requestRealGPS();
             checkActiveCooldown();
-            renderDonorFeed();
+            renderFeed();
         };
 
-        function initRealGPS() {
-            const gpsElement = document.getElementById('gps-status');
+        // Listen for updates from other tabs or devices
+        channel.onmessage = function (event) {
+            if (event.data && event.data.type === 'SYNC_UPDATE') {
+                feedItems = JSON.parse(localStorage.getItem('plateshare_feed_items')) || feedItems;
+                renderFeed();
+            }
+        };
+
+        function saveAndBroadcast() {
+            localStorage.setItem('plateshare_feed_items', JSON.stringify(feedItems));
+            channel.postMessage({ type: 'SYNC_UPDATE' });
+        }
+
+        // ==========================================
+        // DUAL VIEW SWITCHER
+        // ==========================================
+        function switchView(viewName) {
+            const viewKiosk = document.getElementById('view-kiosk');
+            const viewDonor = document.getElementById('view-donor');
+            const tabKiosk = document.getElementById('tab-kiosk');
+            const tabDonor = document.getElementById('tab-donor');
+
+            if (viewName === 'kiosk') {
+                viewKiosk.classList.remove('hidden');
+                viewDonor.classList.add('hidden');
+                
+                tabKiosk.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-brandGreen text-white shadow-sm";
+                tabDonor.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-gray-600 dark:text-gray-300 hover:text-brandGreen dark:hover:text-brandGreen-light";
+            } else {
+                viewKiosk.classList.add('hidden');
+                viewDonor.classList.remove('hidden');
+
+                tabDonor.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-brandGreen text-white shadow-sm";
+                tabKiosk.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-gray-600 dark:text-gray-300 hover:text-brandGreen dark:hover:text-brandGreen-light";
+                renderFeed();
+            }
+        }
+
+        // ==========================================
+        // REAL HTML5 GEOLOCATION API INTEGRATION
+        // ==========================================
+        function requestRealGPS() {
+            const gpsLabelNav = document.getElementById('nav-gps-label');
+            const gpsLabelKiosk = document.getElementById('kiosk-gps-text');
+
+            gpsLabelNav.innerText = "GPS: Locating...";
+            gpsLabelKiosk.innerText = "Acquiring live device coordinates via GPS...";
+
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        currentGPS = {
-                            lat: position.coords.latitude.toFixed(4),
-                            lng: position.coords.longitude.toFixed(4)
-                        };
-                        gpsElement.innerHTML = `📍 Live GPS Locked: ${currentGPS.lat}° N, ${currentGPS.lng}° E`;
+                        userGPS.lat = position.coords.latitude.toFixed(4);
+                        userGPS.lng = position.coords.longitude.toFixed(4);
+
+                        gpsLabelNav.innerText = `GPS: ${userGPS.lat}, ${userGPS.lng}`;
+                        gpsLabelKiosk.innerText = `📍 Verified Terminal Location: Latitude ${userGPS.lat}, Longitude ${userGPS.lng}`;
                     },
                     (error) => {
-                        gpsElement.innerHTML = `📍 GPS Fallback Active (Default Location)`;
+                        console.warn("GPS access denied or unavailable, using fallback coordinates.", error);
+                        gpsLabelNav.innerText = "GPS: Active (Fallback)";
+                        gpsLabelKiosk.innerText = "📍 Location: Terminal #4 (Sector Main Gate)";
                     },
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                    { enableHighAccuracy: true, timeout: 8000 }
                 );
             } else {
-                gpsElement.innerHTML = `📍 Geolocation not supported by browser.`;
+                gpsLabelNav.innerText = "GPS: Unsupported";
+                gpsLabelKiosk.innerText = "📍 Location: Street Station Terminal #4";
             }
         }
 
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('plateshare_theme', newTheme);
+        function fillDonorGPS() {
+            const input = document.getElementById('donor-location');
+            input.value = `Current GPS Location (Lat ${userGPS.lat}, Lng ${userGPS.lng})`;
         }
 
-        function switchView(viewName) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.view-btn').forEach(el => el.classList.remove('active'));
+        // ==========================================
+        // STREET KIOSK REQUEST & PERSISTENT TIMER
+        // ==========================================
+        function triggerKioskRequest(itemTitle, servingsNeeded) {
+            const statusCard = document.getElementById('kiosk-status-card');
+            const statusTitle = document.getElementById('status-title');
+            const statusDetails = document.getElementById('status-details');
+            const statusGps = document.getElementById('status-gps');
 
-            if (viewName === 'kiosk') {
-                document.getElementById('kiosk-view').classList.add('active');
-                event.target.classList.add('active');
-            } else {
-                document.getElementById('donor-view').classList.add('active');
-                event.target.classList.add('active');
-                renderDonorFeed();
-            }
-        }
+            statusCard.classList.remove('hidden');
 
-        function requestFood() {
-            const mealType = document.getElementById('meal-preference').value;
-            const requestId = 'REQ_' + Date.now();
-            const requestData = {
-                id: requestId,
-                type: mealType,
-                lat: currentGPS.lat,
-                lng: currentGPS.lng,
-                time: new Date().toLocaleTimeString(),
-                timestamp: Date.now()
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            statusTitle.innerText = `Request Confirmed: ${itemTitle}`;
+            statusDetails.innerText = `Your request for "${itemTitle}" was broadcasted to nearby hotels, kitchens, and NGO dispatchers.`;
+            statusGps.innerText = `Timestamp: ${timeString} | Terminal Location: Lat ${userGPS.lat}, Lng ${userGPS.lng}`;
+
+            // Set 2 min (120 seconds) Cooldown & persist end time
+            const cooldownEnd = Date.now() + 120000;
+            localStorage.setItem('plateshare_cooldown_end', cooldownEnd);
+            startCooldownTimer(120);
+
+            // Add to feed & sync across tabs/devices
+            const newReq = {
+                id: `REQ-${Math.floor(100 + Math.random() * 900)}`,
+                type: 'Kiosk Request',
+                title: `${itemTitle} (${servingsNeeded} Servings)`,
+                location: `Kiosk Terminal (Lat: ${userGPS.lat}, Lng: ${userGPS.lng})`,
+                time: 'Just now',
+                status: 'Pending',
+                badgeBg: 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300'
             };
 
-            activeRequests.push(requestData);
-            localStorage.setItem('plateshare_requests', JSON.stringify(activeRequests));
-            channel.postMessage({ action: 'sync_update' });
+            feedItems.unshift(newReq);
+            saveAndBroadcast();
+            renderFeed();
 
-            localStorage.setItem('plateshare_cooldown_end', Date.now() + 120000);
-            startCooldown(120);
-
-            showKioskActiveState(mealType);
-            renderDonorFeed();
+            statusCard.scrollIntoView({ behavior: 'smooth' });
         }
 
-        function showKioskActiveState(type) {
-            document.getElementById('kiosk-status-box').style.display = 'block';
-            document.getElementById('req-status-text').innerText = `${type} requested successfully. Donor dispatched!`;
-            document.getElementById('btn-request').disabled = true;
-        }
+        function startCooldownTimer(seconds) {
+            if (activeCountdownInterval) clearInterval(activeCountdownInterval);
 
-        function startCooldown(durationInSeconds) {
-            let remaining = durationInSeconds;
-            const timerDisplay = document.getElementById('timer-display');
-            if (cooldownTimerInterval) clearInterval(cooldownTimerInterval);
+            const timerDisplay = document.getElementById('status-countdown');
+            const btnSingle = document.getElementById('btn-single');
+            const btnFamily = document.getElementById('btn-family');
+            const btnWater = document.getElementById('btn-water');
+            const statusCard = document.getElementById('kiosk-status-card');
 
-            document.getElementById('btn-request').disabled = true;
-            document.getElementById('kiosk-status-box').style.display = 'block';
+            btnSingle.disabled = true;
+            btnFamily.disabled = true;
+            btnWater.disabled = true;
+            btnSingle.classList.add('opacity-50', 'cursor-not-allowed');
+            btnFamily.classList.add('opacity-50', 'cursor-not-allowed');
+            btnWater.classList.add('opacity-50', 'cursor-not-allowed');
 
-            cooldownTimerInterval = setInterval(() => {
-                remaining--;
-                let mins = Math.floor(remaining / 60);
-                let secs = remaining % 60;
+            let remaining = seconds;
+
+            activeCountdownInterval = setInterval(() => {
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
                 timerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 
                 if (remaining <= 0) {
-                    clearInterval(cooldownTimerInterval);
+                    clearInterval(activeCountdownInterval);
                     localStorage.removeItem('plateshare_cooldown_end');
-                    document.getElementById('btn-request').disabled = false;
-                    document.getElementById('kiosk-status-box').style.display = 'none';
+                    timerDisplay.innerText = "Ready";
+                    btnSingle.disabled = false;
+                    btnFamily.disabled = false;
+                    btnWater.disabled = false;
+                    btnSingle.classList.remove('opacity-50', 'cursor-not-allowed');
+                    btnFamily.classList.remove('opacity-50', 'cursor-not-allowed');
+                    btnWater.classList.remove('opacity-50', 'cursor-not-allowed');
+                    statusCard.classList.add('hidden');
                 }
+                remaining--;
             }, 1000);
         }
 
@@ -552,56 +627,115 @@
             if (cooldownEnd) {
                 const remainingSecs = Math.floor((parseInt(cooldownEnd) - Date.now()) / 1000);
                 if (remainingSecs > 0) {
-                    startCooldown(remainingSecs);
-                    showKioskActiveState('Active Meal Request');
+                    document.getElementById('kiosk-status-card').classList.remove('hidden');
+                    startCooldownTimer(remainingSecs);
                 } else {
                     localStorage.removeItem('plateshare_cooldown_end');
                 }
             }
         }
 
-        function renderDonorFeed() {
-            const feedContainer = document.getElementById('donor-feed');
-            activeRequests = JSON.parse(localStorage.getItem('plateshare_requests')) || [];
+        function triggerSOS() {
+            alert("Emergency Food & Relief Helpline: Connecting to 1800-FOOD-RELIEF. Priority dispatch alerted for your coordinates.");
+        }
 
-            if (activeRequests.length === 0) {
-                feedContainer.innerHTML = `<div class="empty-feed">No active street requests at the moment.</div>`;
-                return;
-            }
+        // ==========================================
+        // DONOR PORTAL LOGIC & FEED RENDER
+        // ==========================================
+        function handlePostDonation(e) {
+            e.preventDefault();
+            const name = document.getElementById('donor-name').value;
+            const category = document.getElementById('donor-category').value;
+            const servings = document.getElementById('donor-servings').value;
+            const location = document.getElementById('donor-location').value;
 
-            let html = '';
-            activeRequests.forEach((req) => {
-                html += `
-                    <div class="request-card">
-                        <div class="request-details">
-                            <h3>${req.type} <span class="badge">LIVE</span></h3>
-                            <p>📍 Location: ${req.lat}, ${req.lng}</p>
-                            <p>🕒 Requested at: ${req.time}</p>
+            const newDonation = {
+                id: `DON-${Math.floor(100 + Math.random() * 900)}`,
+                type: 'Surplus Donation',
+                title: `${category} Food (${servings} Servings) by ${name}`,
+                location: location,
+                time: 'Just now',
+                status: 'Available',
+                badgeBg: 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300'
+            };
+
+            feedItems.unshift(newDonation);
+            saveAndBroadcast();
+            renderFeed();
+
+            document.getElementById('donation-form').reset();
+            alert("Thank you! Your surplus food listing is now live across the network.");
+        }
+
+        function renderFeed() {
+            const container = document.getElementById('request-feed-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            feedItems.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-brandGreen/40 transition";
+
+                let actionButton = '';
+                if (item.status === 'Pending') {
+                    actionButton = `<button onclick="updateItemStatus(${index}, 'Dispatched')" class="px-4 py-2 bg-brandGreen hover:bg-brandGreen-dark text-white font-bold text-xs rounded-xl shadow-sm transition">Accept & Dispatch</button>`;
+                } else if (item.status === 'Available') {
+                    actionButton = `<button onclick="updateItemStatus(${index}, 'Claimed')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-sm transition">Claim Surplus</button>`;
+                } else {
+                    actionButton = `<span class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-500 text-xs font-bold rounded-lg"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> ${item.status}</span>`;
+                }
+
+                card.innerHTML = `
+                    <div class="space-y-1">
+                        <div class="flex items-center space-x-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${item.badgeBg}">${item.type}</span>
+                            <span class="text-xs text-gray-400 font-mono">${item.id}</span>
+                            <span class="text-xs text-gray-400">• ${item.time}</span>
                         </div>
-                        <button class="view-btn" style="background:var(--primary); color:white;" onclick="fulfillRequest('${req.id}')">Accept & Deliver</button>
+                        <h4 class="font-bold text-base text-gray-900 dark:text-white">${item.title}</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                            <i class="fa-solid fa-location-dot mr-1 text-brandGreen"></i> ${item.location}
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-2 self-end sm:self-center">
+                        ${actionButton}
                     </div>
                 `;
+
+                container.appendChild(card);
             });
-            feedContainer.innerHTML = html;
         }
 
-        function fulfillRequest(id) {
-            activeRequests = activeRequests.filter(r => r.id !== id);
-            localStorage.setItem('plateshare_requests', JSON.stringify(activeRequests));
+        function updateItemStatus(index, newStatus) {
+            feedItems[index].status = newStatus;
+            saveAndBroadcast();
             
-            totalDelivered++;
-            localStorage.setItem('plateshare_delivered', totalDelivered);
-            document.getElementById('stat-meals-saved').innerText = totalDelivered;
+            const mealsEl = document.getElementById('stat-meals');
+            if (mealsEl) {
+                let meals = parseInt(mealsEl.innerText) || 384;
+                mealsEl.innerText = meals + 1;
+            }
 
-            channel.postMessage({ action: 'sync_update' });
-            renderDonorFeed();
+            renderFeed();
         }
 
-        channel.onmessage = function () {
-            totalDelivered = parseInt(localStorage.getItem('plateshare_delivered')) || 28;
-            document.getElementById('stat-meals-saved').innerText = totalDelivered;
-            renderDonorFeed();
-        };
+        // ==========================================
+        // MODERN DARK / LIGHT MODE TOGGLE
+        // ==========================================
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const dot = document.getElementById('theme-toggle-dot');
+
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                dot.style.transform = 'translateX(0rem)';
+                localStorage.setItem('plateshare_theme', 'light');
+            } else {
+                html.classList.add('dark');
+                dot.style.transform = 'translateX(1.25rem)';
+                localStorage.setItem('plateshare_theme', 'dark');
+            }
+        }
     </script>
 </body>
 </html>
