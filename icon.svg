@@ -6,9 +6,7 @@
       <stop offset="100%" stop-color="#F9A825"/>
     </linearGradient>
   </defs>
-  <!-- App Icon Rounded Square Background -->
   <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
-  <!-- Fork and Knife Icon -->
   <g fill="#FFFFFF" transform="translate(60, 60)">
     <path d="M110 40v120c0 25 20 45 45 45h5v115c0 15 12 27 27 27s27-12 27-27V205h5c25 0 45-20 45-45V40c0-15-12-27-27-27s-27 12-27 27v95h-10V40c0-15-12-27-27-27s-27 12-27 27v95H137V40c0-15-12-27-27-27s-27 12-27 27z"/>
     <path d="M310 320c-15 0-27-12-27-27V30c0-10 6-18 15-22 9-4 20-2 27 5l120 120c15 15 15 39 0 54l-120 120c-4 4-10 7-15 7z"/>
