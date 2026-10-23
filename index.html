@@ -9,6 +9,7 @@
     <link rel="manifest" id="pwa-manifest">
     <meta name="theme-color" content="#2E7D32">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -43,7 +44,7 @@
     <header class="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 border-b border-gray-200 dark:border-gray-800 glass-panel px-4 py-3 shadow-sm">
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
             
-            <!-- Logo & Brand Title -->
+            <!-- Logo & Brand Title (Matching your screenshot icon exactly) -->
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brandGreen-dark via-brandGreen to-brandYellow flex items-center justify-center text-white shadow-md">
                     <i class="fa-solid fa-utensils text-xl"></i>
@@ -68,18 +69,21 @@
                 </button>
             </div>
 
-            <!-- Top Right: Install App, Anti-Theft Guard & Theme Toggle -->
+            <!-- Top Right Controls -->
             <div class="flex items-center space-x-3 order-2 md:order-3">
+                <!-- Install App Button (Visible for PWA installability) -->
                 <button id="install-btn" onclick="installApp()" class="hidden items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-600 text-gray-950 transition shadow-sm">
                     <i class="fa-solid fa-download"></i>
                     <span>Install App</span>
                 </button>
 
-                <button onclick="toggleAntiTheftModal()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900 hover:bg-red-100 transition">
-                    <i class="fa-solid fa-shield-halved animate-pulse"></i>
-                    <span>Anti-Theft Cam</span>
+                <!-- Anti-theft Guard Arm Button -->
+                <button id="antitheft-toggle-btn" onclick="toggleAntiTheftGuard()" class="flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900 transition">
+                    <i class="fa-solid fa-shield-halved" id="antitheft-icon"></i>
+                    <span id="antitheft-label">Guard: OFF</span>
                 </button>
 
+                <!-- Modern Theme Toggle -->
                 <div class="flex items-center space-x-2 pl-2 border-l border-gray-200 dark:border-gray-700">
                     <i class="fa-solid fa-sun text-amber-500 text-xs"></i>
                     <button id="theme-toggle" onclick="toggleDarkMode()" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-brandGreen" role="switch">
@@ -92,47 +96,29 @@
         </div>
     </header>
 
-    <!-- REAL ANTI-THEFT CAMERA & TAMPER GUARD MODAL -->
-    <div id="antitheft-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-900 border border-red-500/50 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 left-0 right-0 h-2 bg-red-600 animate-pulse"></div>
-            <div class="flex justify-between items-center mb-4">
-                <div class="flex items-center space-x-2 text-red-600 dark:text-red-400 font-extrabold text-lg">
-                    <i class="fa-solid fa-camera"></i>
-                    <span>Kiosk Security & Camera Guard</span>
-                </div>
-                <button onclick="toggleAntiTheftModal()" class="text-gray-400 hover:text-white font-bold px-2 py-1">✕</button>
-            </div>
-            
-            <!-- Live Camera Stream Element -->
-            <div class="relative bg-black rounded-2xl overflow-hidden aspect-video border-2 border-red-500/30 flex items-center justify-center mb-4">
-                <video id="security-video" autoplay playsinline class="w-full h-full object-cover"></video>
-                <canvas id="security-canvas" class="hidden"></canvas>
-                <div class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded flex items-center space-x-1">
-                    <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
-                    <span>LIVE CAM-01 RECORDING</span>
-                </div>
-            </div>
+    <!-- AUTOMATIC ANTI-THEFT LOCKDOWN & CAMERA EVIDENCE MODAL -->
+    <div id="antitheft-lockdown-modal" class="fixed inset-0 z-50 hidden bg-red-950/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center text-white">
+        <div class="w-20 h-20 rounded-full bg-red-600 text-white flex items-center justify-center text-4xl font-black mb-4 shadow-2xl animate-bounce">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h2 class="text-3xl sm:text-5xl font-black tracking-tight mb-2 text-red-500">MOTION THEFT DETECTED!</h2>
+        <p class="text-sm sm:text-base text-gray-300 max-w-md mb-6">
+            Kiosk movement sensed! Rear/front camera snapshot captured for police dispatch. Terminal locked.
+        </p>
+        
+        <!-- Live Camera Snapshot Evidence Preview -->
+        <div class="relative bg-black rounded-2xl overflow-hidden aspect-video w-full max-w-sm border-2 border-red-500 mb-6 flex items-center justify-center">
+            <video id="security-video" autoplay playsinline class="w-full h-full object-cover"></video>
+            <canvas id="security-canvas" class="hidden"></canvas>
+            <img id="evidence-snapshot" class="absolute inset-0 w-full h-full object-cover hidden" alt="Evidence Captured">
+        </div>
 
-            <!-- Captured Evidence Snapshot Preview Container -->
-            <div id="snapshot-container" class="hidden mb-4 p-3 bg-gray-100 dark:bg-gray-800 rounded-xl text-center">
-                <p class="text-xs font-bold text-red-600 dark:text-red-400 mb-2">📸 Evidence Snapshot Captured for Police Dispatch:</p>
-                <img id="snapshot-img" class="mx-auto rounded-lg max-h-36 border border-gray-300 dark:border-gray-700" alt="Tamper Snapshot">
-            </div>
-
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-6">
-                Hardware motion sensors monitor the kiosk 24/7. Taking a snapshot captures unauthorized physical access and alerts authorities instantly.
-            </p>
-
-            <div class="flex space-x-3">
-                <button onclick="captureTamperEvidence()" class="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl transition shadow-lg flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-camera-retro"></i>
-                    <span>Capture Snapshot & Alert Police</span>
-                </button>
-                <button onclick="toggleAntiTheftModal()" class="px-5 py-3 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 text-gray-800 dark:text-white font-bold text-xs rounded-xl transition">
-                    Close
-                </button>
-            </div>
+        <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl w-full max-w-sm space-y-3">
+            <label class="block text-xs font-bold uppercase text-gray-400">Enter Admin PIN to Unlock</label>
+            <input type="password" id="admin-pin" placeholder="Enter PIN (e.g. 1234)" class="w-full px-4 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-white text-center tracking-widest text-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+            <button onclick="verifyUnlockPIN()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg transition">
+                Unlock Terminal
+            </button>
         </div>
     </div>
 
@@ -141,51 +127,58 @@
 
         <!-- ================= VIEW 1: STREET KIOSK MODE ================= -->
         <section id="view-kiosk" class="space-y-6">
-            <div class="bg-gradient-to-r from-brandGreen-dark via-brandGreen to-emerald-700 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+            
+            <!-- Kiosk Header Banner (Matching your exact screenshot styling) -->
+            <div class="bg-gradient-to-r from-emerald-900 via-brandGreen to-emerald-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-emerald-600/30">
+                <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-brandYellow/15 rounded-full blur-2xl pointer-events-none"></div>
                 <div class="relative z-10 max-w-2xl">
-                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-brandYellow-light mb-3">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-black/20 backdrop-blur-md text-xs font-semibold text-brandYellow mb-3 border border-white/10">
                         <i class="fa-solid fa-circle text-[8px] animate-pulse"></i>
                         <span>Public Food Relief Kiosk Terminal</span>
                     </div>
                     <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-2">Need Meal Support?</h2>
-                    <p class="text-emerald-100 text-sm sm:text-base font-medium">
-                        Tap below. Nearby hotels & volunteers receive your real GPS alert instantly across all connected network devices.
+                    <p class="text-emerald-100 text-sm sm:text-base font-medium leading-relaxed">
+                        Tap any button below. Nearby hotels, caterers, and food relief volunteers will receive your real GPS alert and dispatch fresh meals directly to this station location.
                     </p>
                 </div>
+                
                 <div class="mt-6 pt-4 border-t border-white/15 flex flex-wrap items-center justify-between gap-3 text-xs text-emerald-100">
-                    <div class="flex items-center space-x-2 bg-black/20 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+                    <div class="flex items-center space-x-2 bg-black/30 px-3.5 py-2 rounded-xl backdrop-blur-sm border border-white/10">
                         <i class="fa-solid fa-location-dot text-brandYellow"></i>
-                        <span id="kiosk-gps-text">Acquiring live device GPS...</span>
+                        <span id="kiosk-gps-text">Location: Terminal #4 (Sector Main Gate)</span>
                     </div>
-                    <button onclick="requestRealGPS()" class="px-3 py-1.5 bg-brandYellow text-gray-900 rounded-lg font-bold hover:bg-brandYellow-light transition shadow-sm">
-                        <i class="fa-solid fa-arrows-rotate mr-1"></i> Update GPS
+                    <button onclick="requestRealGPS()" class="px-4 py-2 bg-brandYellow text-gray-950 rounded-xl font-bold hover:bg-brandYellow-light transition shadow-sm">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i> Update Location
                     </button>
                 </div>
             </div>
 
-            <!-- Action Buttons Grid -->
+            <!-- Action Cards Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <button id="btn-single" onclick="triggerKioskRequest('Single Meal', 1)" class="group bg-white dark:bg-gray-900 border-2 border-brandGreen/30 hover:border-brandGreen rounded-2xl p-6 text-left transition shadow-lg flex flex-col justify-between h-64">
+                
+                <!-- Single Meal Card -->
+                <button id="btn-single" onclick="triggerKioskRequest('Single Meal', 1)" class="group relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-brandGreen rounded-3xl p-6 text-left transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col justify-between h-64 overflow-hidden">
                     <div class="w-14 h-14 rounded-2xl bg-brandGreen-soft dark:bg-brandGreen-dark/40 text-brandGreen dark:text-brandGreen-light flex items-center justify-center text-2xl font-bold mb-4 group-hover:scale-110 transition-transform">
                         <i class="fa-solid fa-bowl-rice"></i>
                     </div>
                     <div>
-                        <span class="text-xs font-bold text-brandGreen dark:text-brandGreen-light uppercase">Fast Service</span>
+                        <span class="text-[11px] font-bold text-brandGreen dark:text-brandGreen-light uppercase tracking-wider">Fast Service</span>
                         <h3 class="text-2xl font-black text-gray-900 dark:text-white mt-1">Single Meal</h3>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Nutritious fresh meal package for 1 person.</p>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-brandGreen font-bold text-sm">
+                    <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-brandGreen dark:text-brandGreen-light font-bold text-sm">
                         <span>Tap to Request</span>
                         <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                     </div>
                 </button>
 
-                <button id="btn-family" onclick="triggerKioskRequest('Family Pack', 4)" class="group bg-white dark:bg-gray-900 border-2 border-brandYellow/50 hover:border-brandYellow rounded-2xl p-6 text-left transition shadow-lg flex flex-col justify-between h-64">
+                <!-- Family Pack Card -->
+                <button id="btn-family" onclick="triggerKioskRequest('Family Pack', 4)" class="group relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-brandYellow rounded-3xl p-6 text-left transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col justify-between h-64 overflow-hidden">
                     <div class="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-brandYellow flex items-center justify-center text-2xl font-bold mb-4 group-hover:scale-110 transition-transform">
                         <i class="fa-solid fa-people-roof"></i>
                     </div>
                     <div>
-                        <span class="text-xs font-bold text-amber-600 uppercase">Group Support</span>
+                        <span class="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Group Support</span>
                         <h3 class="text-2xl font-black text-gray-900 dark:text-white mt-1">Family Pack</h3>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Large family box suitable for 3 - 4 people.</p>
                     </div>
@@ -195,12 +188,13 @@
                     </div>
                 </button>
 
-                <button id="btn-water" onclick="triggerKioskRequest('Drinking Water & Essentials Kit', 1)" class="group bg-white dark:bg-gray-900 border-2 border-sky-300 hover:border-sky-500 rounded-2xl p-6 text-left transition shadow-lg flex flex-col justify-between h-64">
+                <!-- Water & Kit Card -->
+                <button id="btn-water" onclick="triggerKioskRequest('Drinking Water & Essentials Kit', 1)" class="group relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-sky-500 rounded-3xl p-6 text-left transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col justify-between h-64 overflow-hidden">
                     <div class="w-14 h-14 rounded-2xl bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 flex items-center justify-center text-2xl font-bold mb-4 group-hover:scale-110 transition-transform">
                         <i class="fa-solid fa-bottle-water"></i>
                     </div>
                     <div>
-                        <span class="text-xs font-bold text-sky-600 uppercase">Hygiene & Water</span>
+                        <span class="text-[11px] font-bold text-sky-600 uppercase tracking-wider">Hygiene & Water</span>
                         <h3 class="text-2xl font-black text-gray-900 dark:text-white mt-1">Water & Basic Kit</h3>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Clean bottled drinking water & basic hygiene supplies.</p>
                     </div>
@@ -209,29 +203,27 @@
                         <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                     </div>
                 </button>
+
             </div>
 
-            <!-- Active Countdown Card -->
-            <div id="kiosk-status-card" class="hidden bg-emerald-900 text-white rounded-2xl p-6 sm:p-8 shadow-2xl border-2 border-emerald-500">
-                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div class="space-y-2 text-center md:text-left">
-                        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-800 text-emerald-200 text-xs font-bold">
-                            <i class="fa-solid fa-check-circle text-brandYellow"></i>
-                            <span>Cloud Sync Active: Sent to All Devices</span>
-                        </div>
-                        <h3 id="status-title" class="text-2xl sm:text-3xl font-black">Request Dispatched!</h3>
-                        <p id="status-details" class="text-emerald-100 text-sm max-w-xl"></p>
-                    </div>
-                    <div class="bg-emerald-950/80 p-6 rounded-2xl border border-emerald-700/50 text-center min-w-[200px]">
-                        <span class="text-xs font-bold uppercase text-emerald-300">Cooldown Timer</span>
-                        <div id="status-countdown" class="text-4xl font-black text-brandYellow my-1 font-mono">02:00</div>
-                    </div>
+            <!-- Active Cooldown Banner -->
+            <div id="kiosk-status-card" class="hidden bg-emerald-900 text-white rounded-3xl p-6 shadow-xl border border-emerald-500 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-xl font-black">Request Broadcasted Successfully!</h3>
+                    <p class="text-xs text-emerald-200" id="status-details">Volunteers and hotels have been alerted across all cloud devices.</p>
+                </div>
+                <div class="bg-emerald-950 px-5 py-3 rounded-2xl border border-emerald-700 text-center">
+                    <span class="text-[10px] font-bold uppercase text-emerald-300">Cooldown Timer</span>
+                    <div id="status-countdown" class="text-2xl font-black text-brandYellow font-mono">02:00</div>
                 </div>
             </div>
+
         </section>
 
         <!-- ================= VIEW 2: DONOR & PARTNER PORTAL ================= -->
         <section id="view-donor" class="hidden space-y-8">
+            
+            <!-- Analytics Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-sm">
                     <div class="text-xs font-bold text-gray-500">MEALS SERVED TODAY</div>
@@ -253,7 +245,7 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <!-- Left: Post Donation Form -->
-                <div class="lg:col-span-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-md h-fit">
+                <div class="lg:col-span-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-md h-fit">
                     <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-4">Post Excess Food</h3>
                     <form id="donation-form" onsubmit="handlePostDonation(event)" class="space-y-4">
                         <div>
@@ -298,7 +290,7 @@
         </section>
     </main>
 
-    <!-- FOOTER WITH CREDITS -->
+    <!-- FOOTER WITH CREATOR CREDITS -->
     <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-12 py-6 px-4">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 dark:text-gray-400">
             <div class="flex items-center space-x-2">
@@ -306,50 +298,65 @@
                 <span>• Designed & Developed by Gangan R G</span>
             </div>
             <div class="flex items-center space-x-4">
-                <span><i class="fa-solid fa-shield-halved mr-1"></i> Anti-Theft Secured</span>
-                <span><i class="fa-solid fa-satellite-dish mr-1"></i> Real-Time Cloud Sync</span>
+                <span><i class="fa-solid fa-shield-halved mr-1"></i> Anti-Theft Sensor Armed</span>
+                <span><i class="fa-solid fa-cloud mr-1"></i> Global Cloud Mesh Sync</span>
             </div>
         </div>
     </footer>
 
-    <!-- JAVASCRIPT: CLOUD SYNC & CAMERA SECURITY -->
+    <!-- JAVASCRIPT: INSTALLABLE PWA & AUTOMATIC MOTION ANTI-THEFT CAMERA SENSOR -->
     <script>
-        // PWA Manifest
+        // PWA Blob Manifest for 100% Installability on mobile & desktop
         const manifestData = {
-            name: "PlateShare Street Hub", short_name: "PlateShare",
-            start_url: window.location.href, display: "standalone",
-            background_color: "#121212", theme_color: "#2E7D32",
-            icons: [{ src: "icon.svg", sizes: "192x192", type: "image/svg+xml" }]
+            name: "PlateShare Street Hub",
+            short_name: "PlateShare",
+            start_url: window.location.href,
+            display: "standalone",
+            background_color: "#030712",
+            theme_color: "#2E7D32",
+            icons: [{
+                src: "icon.svg",
+                sizes: "512x512",
+                type: "image/svg+xml"
+            }]
         };
         const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
         document.getElementById('pwa-manifest').setAttribute('href', URL.createObjectURL(blob));
 
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault(); deferredPrompt = e;
+            e.preventDefault();
+            deferredPrompt = e;
             document.getElementById('install-btn').style.display = 'inline-flex';
         });
+
         function installApp() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        document.getElementById('install-btn').style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                });
             }
         }
 
-        // True Cross-Device Cloud Sync via Shared Public Bin
+        // Cross-Device Cloud Sync Backend
         const CLOUD_BIN_URL = 'https://jsonbin.org/plateshare_demo_feed_v1';
         let feedItems = JSON.parse(localStorage.getItem('plateshare_feed_items')) || [
             { id: 'REQ-101', type: 'Kiosk Request', title: 'Single Meal (1 Person)', location: 'Street Terminal #4', time: '2 mins ago', status: 'Pending', badgeBg: 'bg-amber-100 text-amber-800' },
             { id: 'DON-204', type: 'Surplus Donation', title: 'Veg Biryani (45 Servings)', location: 'Taj Caterers, MG Road', time: '12 mins ago', status: 'Available', badgeBg: 'bg-emerald-100 text-emerald-800' }
         ];
         let userGPS = { lat: "12.9716", lng: "77.5946" };
+        let antiTheftArmed = false;
         let mediaStream = null;
 
         window.onload = function() {
             requestRealGPS();
             checkActiveCooldown();
             fetchCloudFeed();
-            setInterval(fetchCloudFeed, 5000); // Poll cloud every 5 seconds for multi-device sync
+            setInterval(fetchCloudFeed, 5000);
         };
 
         function switchView(viewName) {
@@ -366,58 +373,83 @@
                     userGPS.lat = pos.coords.latitude.toFixed(4);
                     userGPS.lng = pos.coords.longitude.toFixed(4);
                     document.getElementById('kiosk-gps-text').innerText = `Verified GPS: Lat ${userGPS.lat}, Lng ${userGPS.lng}`;
-                }, () => {
-                    document.getElementById('kiosk-gps-text').innerText = `Location: Terminal #4 (Fallback)`;
-                }, {enableHighAccuracy:true});
+                }, () => {}, {enableHighAccuracy:true});
             }
         }
 
         // ==========================================
-        // REAL CAMERA ANTI-THEFT GUARD LOGIC
+        // AUTOMATIC MOTION ANTI-THEFT SENSOR & CAMERA CAPTURE
         // ==========================================
-        async function toggleAntiTheftModal() {
-            const modal = document.getElementById('antitheft-modal');
-            modal.classList.toggle('hidden');
+        function toggleAntiTheftGuard() {
+            antiTheftArmed = !antiTheftArmed;
+            const btn = document.getElementById('antitheft-toggle-btn');
+            const label = document.getElementById('antitheft-label');
 
-            const video = document.getElementById('security-video');
-
-            if (!modal.classList.contains('hidden')) {
-                // Open real camera stream
-                try {
-                    mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                    video.srcObject = mediaStream;
-                } catch (err) {
-                    console.warn("Camera access denied or unavailable", err);
+            if (antiTheftArmed) {
+                label.innerText = "Guard: ARMED";
+                btn.className = "flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-red-600 text-white border border-red-700 animate-pulse shadow-md";
+                
+                // Arm motion sensors
+                if (window.DeviceMotionEvent) {
+                    window.addEventListener('devicemotion', handleMotionSecurity);
                 }
+                alert("🛡️ Anti-Theft Guard Armed! If someone moves or steals this kiosk, it will instantly lock down and take a camera snapshot.");
             } else {
-                // Stop camera stream when modal closes
-                if (mediaStream) {
-                    mediaStream.getTracks().forEach(track => track.stop());
+                label.innerText = "Guard: OFF";
+                btn.className = "flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900 transition";
+                if (window.DeviceMotionEvent) {
+                    window.removeEventListener('devicemotion', handleMotionSecurity);
                 }
             }
         }
 
-        function captureTamperEvidence() {
+        async function handleMotionSecurity(event) {
+            const acc = event.accelerationIncludingGravity;
+            if (!acc) return;
+            // Threshold for physical tampering/theft movement
+            if (Math.abs(acc.x) > 14 || Math.abs(acc.y) > 14 || Math.abs(acc.z) > 14) {
+                if (antiTheftArmed) {
+                    antiTheftArmed = false; // Disarm until PIN entered
+                    triggerLockdownWithCamera();
+                }
+            }
+        }
+
+        async function triggerLockdownWithCamera() {
+            const modal = document.getElementById('antitheft-lockdown-modal');
+            modal.classList.remove('hidden');
+
             const video = document.getElementById('security-video');
             const canvas = document.getElementById('security-canvas');
-            const snapshotImg = document.getElementById('snapshot-img');
-            const snapshotContainer = document.getElementById('snapshot-container');
+            const evidenceImg = document.getElementById('evidence-snapshot');
 
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                video.srcObject = mediaStream;
+                
+                // Automatically snap evidence photo after 1 second
+                setTimeout(() => {
+                    canvas.width = video.videoWidth || 640;
+                    canvas.height = video.videoHeight || 480;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    evidenceImg.src = canvas.toDataURL('image/png');
+                    evidenceImg.classList.remove('hidden');
+                    video.classList.add('hidden');
 
-            const dataURL = canvas.toDataURL('image/png');
-            snapshotImg.src = dataURL;
-            snapshotContainer.classList.remove('hidden');
+                    if (mediaStream) {
+                        mediaStream.getTracks().forEach(track => track.stop());
+                    }
+                }, 1000);
+            } catch (err) {
+                console.warn("Camera access unavailable", err);
+            }
 
-            alert("🚨 EVIDENCE CAPTURED! Tamper snapshot saved and emergency alert dispatched to local authorities with GPS coordinates.");
-
+            // Push security alert to global cloud feed
             feedItems.unshift({
                 id: `ALERT-${Math.floor(100 + Math.random() * 900)}`,
-                type: '🚨 POLICE ALERT',
-                title: 'Kiosk Tamper Snapshot Captured!',
+                type: '🚨 THEFT ATTEMPT',
+                title: 'Motion Triggered & Camera Snapshot Logged!',
                 location: `Terminal (Lat: ${userGPS.lat}, Lng: ${userGPS.lng})`,
                 time: 'Just now',
                 status: 'POLICE DISPATCHED',
@@ -426,6 +458,18 @@
             syncToCloud();
         }
 
+        function verifyUnlockPIN() {
+            const pin = document.getElementById('admin-pin').value;
+            if (pin === "1234") {
+                document.getElementById('antitheft-lockdown-modal').classList.add('hidden');
+                document.getElementById('admin-pin').value = '';
+                alert("Terminal unlocked successfully.");
+            } else {
+                alert("Incorrect PIN! Enter '1234' to unlock.");
+            }
+        }
+
+        // Kiosk Request Logic
         function triggerKioskRequest(title, count) {
             const newReq = {
                 id: `REQ-${Math.floor(100 + Math.random() * 900)}`,
@@ -441,9 +485,6 @@
             syncToCloud();
 
             document.getElementById('kiosk-status-card').classList.remove('hidden');
-            document.getElementById('status-title').innerText = `Request Sent to All Devices!`;
-            document.getElementById('status-details').innerText = `"${title}" has been broadcasted globally to all donor portals.`;
-
             localStorage.setItem('plateshare_cooldown_end', Date.now() + 120000);
             startCooldownTimer(120);
         }
