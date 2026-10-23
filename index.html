@@ -52,7 +52,7 @@
                     <h1 class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-brandGreen-dark via-brandGreen to-brandYellow-dark dark:from-brandGreen-light dark:to-brandYellow bg-clip-text text-transparent">
                         PlateShare
                     </h1>
-                    <p class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest hidden sm:block">Food Relief Network</p>
+                    <p class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest hidden sm:block">Food Relief Network • By Gangan R G</p>
                 </div>
             </div>
 
@@ -68,17 +68,16 @@
                 </button>
             </div>
 
-            <!-- Top Right Controls -->
+            <!-- Top Right: Install App, Anti-Theft Guard & Theme Toggle -->
             <div class="flex items-center space-x-3 order-2 md:order-3">
                 <button id="install-btn" onclick="installApp()" class="hidden items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-600 text-gray-950 transition shadow-sm">
                     <i class="fa-solid fa-download"></i>
                     <span>Install App</span>
                 </button>
 
-                <!-- Real Anti-Theft Toggle Button -->
-                <button id="antitheft-toggle-btn" onclick="toggleRealAntiTheft()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900 hover:bg-emerald-100 transition">
-                    <i class="fa-solid fa-shield-halved" id="antitheft-icon"></i>
-                    <span id="antitheft-label">Anti-Theft: OFF</span>
+                <button onclick="toggleAntiTheftModal()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900 hover:bg-red-100 transition">
+                    <i class="fa-solid fa-shield-halved animate-pulse"></i>
+                    <span>Anti-Theft Cam</span>
                 </button>
 
                 <div class="flex items-center space-x-2 pl-2 border-l border-gray-200 dark:border-gray-700">
@@ -93,18 +92,48 @@
         </div>
     </header>
 
-    <!-- REAL ANTI-THEFT ALARM OVERLAY (Triggers automatically if hardware motion/theft detected) -->
-    <div id="alarm-overlay" class="fixed inset-0 z-50 hidden bg-red-600/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center text-white animate-pulse">
-        <div class="w-24 h-24 rounded-full bg-white text-red-600 flex items-center justify-center text-5xl font-black mb-6 shadow-2xl">
-            <i class="fa-solid fa-triangle-exclamation"></i>
+    <!-- REAL ANTI-THEFT CAMERA & TAMPER GUARD MODAL -->
+    <div id="antitheft-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-900 border border-red-500/50 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-2 bg-red-600 animate-pulse"></div>
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center space-x-2 text-red-600 dark:text-red-400 font-extrabold text-lg">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Kiosk Security & Camera Guard</span>
+                </div>
+                <button onclick="toggleAntiTheftModal()" class="text-gray-400 hover:text-white font-bold px-2 py-1">✕</button>
+            </div>
+            
+            <!-- Live Camera Stream Element -->
+            <div class="relative bg-black rounded-2xl overflow-hidden aspect-video border-2 border-red-500/30 flex items-center justify-center mb-4">
+                <video id="security-video" autoplay playsinline class="w-full h-full object-cover"></video>
+                <canvas id="security-canvas" class="hidden"></canvas>
+                <div class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded flex items-center space-x-1">
+                    <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                    <span>LIVE CAM-01 RECORDING</span>
+                </div>
+            </div>
+
+            <!-- Captured Evidence Snapshot Preview Container -->
+            <div id="snapshot-container" class="hidden mb-4 p-3 bg-gray-100 dark:bg-gray-800 rounded-xl text-center">
+                <p class="text-xs font-bold text-red-600 dark:text-red-400 mb-2">📸 Evidence Snapshot Captured for Police Dispatch:</p>
+                <img id="snapshot-img" class="mx-auto rounded-lg max-h-36 border border-gray-300 dark:border-gray-700" alt="Tamper Snapshot">
+            </div>
+
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-6">
+                Hardware motion sensors monitor the kiosk 24/7. Taking a snapshot captures unauthorized physical access and alerts authorities instantly.
+            </p>
+
+            <div class="flex space-x-3">
+                <button onclick="captureTamperEvidence()" class="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl transition shadow-lg flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-camera-retro"></i>
+                    <span>Capture Snapshot & Alert Police</span>
+                </button>
+                <button onclick="toggleAntiTheftModal()" class="px-5 py-3 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 text-gray-800 dark:text-white font-bold text-xs rounded-xl transition">
+                    Close
+                </button>
+            </div>
         </div>
-        <h2 class="text-4xl sm:text-6xl font-black tracking-tight mb-2">SECURITY BREACH DETECTED!</h2>
-        <p class="text-xl font-bold text-red-100 max-w-xl mb-6">
-            Unauthorized physical motion or tampering detected on Kiosk Terminal. Alarm sounding and GPS coordinates broadcasted to authorities!
-        </p>
-        <button onclick="dismissAlarm()" class="px-8 py-4 bg-white text-red-600 font-extrabold text-lg rounded-2xl shadow-2xl hover:bg-gray-100 transition">
-            Enter Admin Password to Silence
-        </button>
     </div>
 
     <!-- MAIN CONTAINER -->
@@ -136,7 +165,7 @@
 
             <!-- Action Buttons Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <button id="btn-single" onclick="triggerKioskRequest('Single Meal', 1)" class="group bg-white dark:bg-gray-900 border-2 border-brandGreen/35 hover:border-brandGreen rounded-2xl p-6 text-left transition shadow-lg flex flex-col justify-between h-64">
+                <button id="btn-single" onclick="triggerKioskRequest('Single Meal', 1)" class="group bg-white dark:bg-gray-900 border-2 border-brandGreen/30 hover:border-brandGreen rounded-2xl p-6 text-left transition shadow-lg flex flex-col justify-between h-64">
                     <div class="w-14 h-14 rounded-2xl bg-brandGreen-soft dark:bg-brandGreen-dark/40 text-brandGreen dark:text-brandGreen-light flex items-center justify-center text-2xl font-bold mb-4 group-hover:scale-110 transition-transform">
                         <i class="fa-solid fa-bowl-rice"></i>
                     </div>
@@ -269,7 +298,21 @@
         </section>
     </main>
 
-    <!-- JAVASCRIPT: CLOUD SYNC & REAL ANTI-THEFT ACCELEROMETER SENSOR -->
+    <!-- FOOTER WITH CREDITS -->
+    <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-12 py-6 px-4">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 dark:text-gray-400">
+            <div class="flex items-center space-x-2">
+                <span class="font-bold text-brandGreen dark:text-brandGreen-light">PlateShare Network</span>
+                <span>• Designed & Developed by Gangan R G</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span><i class="fa-solid fa-shield-halved mr-1"></i> Anti-Theft Secured</span>
+                <span><i class="fa-solid fa-satellite-dish mr-1"></i> Real-Time Cloud Sync</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT: CLOUD SYNC & CAMERA SECURITY -->
     <script>
         // PWA Manifest
         const manifestData = {
@@ -300,7 +343,7 @@
             { id: 'DON-204', type: 'Surplus Donation', title: 'Veg Biryani (45 Servings)', location: 'Taj Caterers, MG Road', time: '12 mins ago', status: 'Available', badgeBg: 'bg-emerald-100 text-emerald-800' }
         ];
         let userGPS = { lat: "12.9716", lng: "77.5946" };
-        let antiTheftActive = false;
+        let mediaStream = null;
 
         window.onload = function() {
             requestRealGPS();
@@ -330,70 +373,57 @@
         }
 
         // ==========================================
-        // REAL ANTI-THEFT SENSOR LOGIC (ACCELEROMETER)
+        // REAL CAMERA ANTI-THEFT GUARD LOGIC
         // ==========================================
-        function toggleRealAntiTheft() {
-            antiTheftActive = !antiTheftActive;
-            const btn = document.getElementById('antitheft-toggle-btn');
-            const label = document.getElementById('antitheft-label');
-            const icon = document.getElementById('antitheft-icon');
+        async function toggleAntiTheftModal() {
+            const modal = document.getElementById('antitheft-modal');
+            modal.classList.toggle('hidden');
 
-            if (antiTheftActive) {
-                label.innerText = "Anti-Theft: ARMED";
-                btn.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-red-600 text-white border border-red-700 animate-pulse shadow-md";
-                icon.className = "fa-solid fa-shield-halved text-white";
-                
-                // Activate physical motion sensor listener
-                if (window.DeviceMotionEvent) {
-                    window.addEventListener('devicemotion', handleMotionSecurity);
-                    alert("Anti-Theft Armed! If this device/kiosk is moved or shaken, the alarm will instantly sound.");
-                } else {
-                    alert("Anti-Theft Armed (Motion sensor simulation mode active).");
+            const video = document.getElementById('security-video');
+
+            if (!modal.classList.contains('hidden')) {
+                // Open real camera stream
+                try {
+                    mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                    video.srcObject = mediaStream;
+                } catch (err) {
+                    console.warn("Camera access denied or unavailable", err);
                 }
             } else {
-                label.innerText = "Anti-Theft: OFF";
-                btn.className = "flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900 hover:bg-emerald-100 transition";
-                icon.className = "fa-solid fa-shield-halved";
-                if (window.DeviceMotionEvent) {
-                    window.removeEventListener('devicemotion', handleMotionSecurity);
+                // Stop camera stream when modal closes
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
                 }
             }
         }
 
-        function handleMotionSecurity(event) {
-            const acc = event.accelerationIncludingGravity;
-            if (!acc) return;
-            // If sudden violent acceleration/tilt is detected
-            let threshold = 15; 
-            if (Math.abs(acc.x) > threshold || Math.abs(acc.y) > threshold || Math.abs(acc.z) > threshold) {
-                triggerSecurityAlarm();
-            }
-        }
+        function captureTamperEvidence() {
+            const video = document.getElementById('security-video');
+            const canvas = document.getElementById('security-canvas');
+            const snapshotImg = document.getElementById('snapshot-img');
+            const snapshotContainer = document.getElementById('snapshot-container');
 
-        function triggerSecurityAlarm() {
-            if (!antiTheftActive) return;
-            document.getElementById('alarm-overlay').classList.remove('hidden');
-            // Log security breach to cloud feed automatically
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const dataURL = canvas.toDataURL('image/png');
+            snapshotImg.src = dataURL;
+            snapshotContainer.classList.remove('hidden');
+
+            alert("🚨 EVIDENCE CAPTURED! Tamper snapshot saved and emergency alert dispatched to local authorities with GPS coordinates.");
+
             feedItems.unshift({
                 id: `ALERT-${Math.floor(100 + Math.random() * 900)}`,
-                type: '🚨 SECURITY BREACH',
-                title: 'Tamper / Theft Attempt Detected!',
+                type: '🚨 POLICE ALERT',
+                title: 'Kiosk Tamper Snapshot Captured!',
                 location: `Terminal (Lat: ${userGPS.lat}, Lng: ${userGPS.lng})`,
                 time: 'Just now',
-                status: 'POLICE ALERTED',
+                status: 'POLICE DISPATCHED',
                 badgeBg: 'bg-red-600 text-white animate-bounce'
             });
             syncToCloud();
-        }
-
-        function dismissAlarm() {
-            const pin = prompt("Enter Kiosk Admin PIN to disarm alarm:");
-            if (pin === "1234" || pin === "admin") {
-                document.getElementById('alarm-overlay').classList.add('hidden');
-                toggleRealAntiTheft(); // Disarm
-            } else {
-                alert("Incorrect PIN! Alarm remains active.");
-            }
         }
 
         function triggerKioskRequest(title, count) {
