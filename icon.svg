@@ -1,14 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1B5E20" />
-      <stop offset="50%" stop-color="#2E7D32" />
-      <stop offset="100%" stop-color="#F9A825" />
+    <linearGradient id="exactLogoGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#113F15" />
+      <stop offset="45%" stop-color="#1E6B23" />
+      <stop offset="80%" stop-color="#2E7D32" />
+      <stop offset="100%" stop-color="#E6A100" />
     </linearGradient>
   </defs>
-  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
-  <g fill="#FFFFFF" transform="translate(76, 76)">
-    <path d="M100 40v110c0 22 18 40 40 40h10v130c0 14 11 25 25 25s25-11 25-25V190h10c22 0 40-18 40-40V40c0-11-9-20-20-20s-20 9-20 20v80h-15V40c0-11-9-20-20-20s-20 9-20 20v80h-15V40c0-11-9-20-20-20s-20 9-20 20z" />
-    <path d="M260 40c0-11 9-20 20-20h5c55 0 95 40 95 95v75c0 22-18 40-40 40h-40v115c0 14-11 25-25 25s-25-11-25-25V40z" />
+  
+  <!-- Rounded Square Tile Background -->
+  <rect width="512" height="512" rx="118" fill="url(#exactLogoGrad)" />
+  
+  <!-- Centered Fork and Knife Silhouette -->
+  <g fill="#FFFFFF" transform="translate(86, 86)">
+    <!-- Fork -->
+    <path d="M84 24v115c0 24 19 43 43 43h11v145c0 14 11 25 25 25s25-11 25-25V182h11c24 0 43-19 43-43V24c0-12-10-22-22-22s-22 10-22 22v92h-15V24c0-12-10-22-22-22s-22 10-22 22v92h-15V24c0-12-10-22-22-22s-22 10-22 22z" />
+    <!-- Knife -->
+    <path d="M264 24c0-12 10-22 22-22h11c58 0 98 42 98 98v98c0 24-19 43-43 43h-43v142c0 14-11 25-25 25s-25-11-25-25V24z" />
   </g>
 </svg>
