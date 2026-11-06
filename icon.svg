@@ -6,13 +6,9 @@
       <stop offset="100%" stop-color="#F9A825" />
     </linearGradient>
   </defs>
-  <!-- Rounded Rect Background -->
   <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
-  <!-- Crisp White Fork and Knife Icon -->
   <g fill="#FFFFFF" transform="translate(76, 76)">
-    <!-- Fork -->
     <path d="M100 40v110c0 22 18 40 40 40h10v130c0 14 11 25 25 25s25-11 25-25V190h10c22 0 40-18 40-40V40c0-11-9-20-20-20s-20 9-20 20v80h-15V40c0-11-9-20-20-20s-20 9-20 20v80h-15V40c0-11-9-20-20-20s-20 9-20 20z" />
-    <!-- Knife -->
     <path d="M260 40c0-11 9-20 20-20h5c55 0 95 40 95 95v75c0 22-18 40-40 40h-40v115c0 14-11 25-25 25s-25-11-25-25V40z" />
   </g>
 </svg>
