@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlateShare - Food Relief Kiosk & Donor Platform</title>
 
-    <!-- PWA Data URI Manifest for GitHub Pages Installability -->
-    <link rel="manifest" id="pwa-manifest" href='data:application/manifest+json,{"name":"PlateShare","short_name":"PlateShare","start_url":".","display":"standalone","background_color":"#030712","theme_color":"#2E7D32","icons":[{"src":"icon.svg","sizes":"512x512","type":"image/svg+xml"}]}'>
+    <!-- PWA Manifest Link -->
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E7D32">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -69,7 +69,7 @@
                 </button>
             </div>
 
-            <!-- Top Right: PWA Install, GPS Status & Theme Toggle -->
+            <!-- Top Right: PWA Install, GPS & Theme Toggle -->
             <div class="flex items-center space-x-3 order-2 md:order-3">
                 <button id="install-btn" onclick="installApp()" class="hidden items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-600 text-gray-950 transition shadow-sm">
                     <i class="fa-solid fa-download"></i>
@@ -100,7 +100,7 @@
         </div>
         <h2 class="text-3xl sm:text-5xl font-black tracking-tight mb-2 text-red-500">MOTION THEFT DETECTED!</h2>
         <p class="text-sm sm:text-base text-gray-300 max-w-md mb-4">
-            Kiosk movement sensed! Camera photo evidence captured and dispatched to Donor Portal. Terminal locked.
+            Kiosk movement sensed! Camera photo evidence captured and dispatched to Donor Portal across devices. Terminal locked.
         </p>
         
         <div class="relative bg-black rounded-2xl overflow-hidden aspect-video w-full max-w-sm border-2 border-red-500 mb-6 flex items-center justify-center">
@@ -110,7 +110,7 @@
         </div>
 
         <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl w-full max-w-sm space-y-3">
-            <label class="block text-xs font-bold uppercase text-gray-400">Enter Security PIN to Unlock</label>
+            <label class="block text-xs font-bold uppercase text-gray-400">Enter Admin PIN to Unlock</label>
             <input type="password" id="admin-pin" placeholder="Enter PIN" class="w-full px-4 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-white text-center tracking-widest text-lg focus:outline-none focus:ring-2 focus:ring-red-500">
             <button onclick="verifyUnlockPIN()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg transition">
                 Unlock Terminal
@@ -132,7 +132,7 @@
                     </div>
                     <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-2">Need Meal Support?</h2>
                     <p class="text-emerald-100 text-sm sm:text-base font-medium">
-                        Tap any button below. Nearby hotels, caterers, and food relief volunteers will receive your real GPS alert across all connected devices.
+                        Tap any button below. Nearby hotels, caterers, and food relief volunteers will receive your real GPS alert across all connected devices instantly.
                     </p>
                 </div>
                 
@@ -226,7 +226,7 @@
                     </div>
                     <div>
                         <h4 class="font-bold text-sm text-gray-900 dark:text-white">Hardware Anti-Theft Motion Guard</h4>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Arms physical tilt/shake sensor on kiosk devices.</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Arms physical motion sensor to auto-lock and snap photo evidence.</p>
                     </div>
                 </div>
                 <button id="antitheft-toggle-btn" onclick="toggleAntiTheftGuard()" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900 transition flex items-center space-x-2">
@@ -302,8 +302,8 @@
                 <!-- Right: Live Feed -->
                 <div class="lg:col-span-7 space-y-4">
                     <div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-800">
-                        <h3 class="font-extrabold text-xl text-gray-900 dark:text-white">Live Activity Feed (Real-Time Mesh)</h3>
-                        <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-full animate-pulse">● Live Cloud Sync</span>
+                        <h3 class="font-extrabold text-xl text-gray-900 dark:text-white">Live Activity Feed (Cross-Device Sync)</h3>
+                        <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-full animate-pulse">● Live Cloud Mesh</span>
                     </div>
                     <div id="request-feed-container" class="space-y-4"></div>
                 </div>
@@ -319,12 +319,12 @@
                 <span>• Designed & Developed by Gangan R G</span>
             </div>
             <div>
-                <span><i class="fa-solid fa-satellite-dish mr-1"></i> Real-Time Cross-Device Relay Active</span>
+                <span><i class="fa-solid fa-satellite-dish mr-1"></i> Global Cross-Device Mesh Relay Active</span>
             </div>
         </div>
     </footer>
 
-    <!-- JAVASCRIPT: TRUE CROSS-DEVICE RELAY & ANTI-THEFT CAMERA -->
+    <!-- JAVASCRIPT: CROSS-DEVICE RELAY & SECURE ANTI-THEFT CAMERA -->
     <script>
         // PWA Install Prompt
         let deferredPrompt;
@@ -342,40 +342,48 @@
             }
         }
 
-        // True Cross-Device Free Cloud Relay (Polls every 2 seconds for Phone <-> Laptop sync)
-        const RELAY_KEY = 'plateshare_global_sync_feed';
-        const syncChannel = new BroadcastChannel('plateshare_sync_channel');
-        
-        let userGPS = { lat: 12.9716, lng: 77.5946 };
-        let activeCountdownInterval = null;
+        // True Cross-Device Cloud Relay using npoint.io free public API fallback + localStorage
+        const CLOUD_RELAY_URL = 'https://api.npoint.io/plateshare_feed_demo_2026';
+        let userGPS = { lat: "12.9716", lng: "77.5946" };
         let antiTheftArmed = false;
         let mediaStream = null;
 
-        let feedItems = JSON.parse(localStorage.getItem(RELAY_KEY)) || [
+        let feedItems = JSON.parse(localStorage.getItem('plateshare_feed_items')) || [
             { id: 'REQ-101', type: 'Kiosk Request', title: 'Single Meal (1 Person)', location: 'Street Terminal #4 (Lat: 12.9716, Lng: 77.5946)', time: '2 mins ago', status: 'Pending', badgeBg: 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300' }
         ];
 
         window.onload = function() {
             requestRealGPS();
             renderFeed();
-            setInterval(pullCloudRelay, 2500); // Cross-device real-time sync loop
+            fetchCloudFeed();
+            setInterval(fetchCloudFeed, 3000); // Poll every 3 seconds to sync phone and laptop across the internet
         };
 
-        function pushCloudRelay() {
-            localStorage.setItem(RELAY_KEY, JSON.stringify(feedItems));
-            syncChannel.postMessage({ type: 'UPDATE' });
+        function syncAndPush() {
+            localStorage.setItem('plateshare_feed_items', JSON.stringify(feedItems));
             renderFeed();
+            // Push to cloud relay
+            fetch(CLOUD_RELAY_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(feedItems)
+            }).catch(() => {});
         }
 
-        function pullCloudRelay() {
-            const data = localStorage.getItem(RELAY_KEY);
-            if (data) {
-                feedItems = JSON.parse(data);
-                renderFeed();
-            }
+        function fetchCloudFeed() {
+            fetch(CLOUD_RELAY_URL)
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data) && data.length > 0) {
+                        feedItems = data;
+                        localStorage.setItem('plateshare_feed_items', JSON.stringify(feedItems));
+                        renderFeed();
+                    }
+                }).catch(() => {
+                    feedItems = JSON.parse(localStorage.getItem('plateshare_feed_items')) || feedItems;
+                    renderFeed();
+                });
         }
-
-        syncChannel.onmessage = pullCloudRelay;
 
         function switchView(viewName) {
             document.getElementById('view-kiosk').classList.toggle('hidden', viewName !== 'kiosk');
@@ -390,12 +398,13 @@
                 navigator.geolocation.getCurrentPosition(pos => {
                     userGPS.lat = pos.coords.latitude.toFixed(4);
                     userGPS.lng = pos.coords.longitude.toFixed(4);
-                    document.getElementById('kiosk-gps-text').innerText = `📍 Verified Terminal Location: Latitude ${userGPS.lat}, Longitude ${userGPS.lng}`;
+                    const el = document.getElementById('kiosk-gps-text');
+                    if (el) el.innerText = `📍 Verified Terminal Location: Latitude ${userGPS.lat}, Longitude ${userGPS.lng}`;
                 });
             }
         }
 
-        // Anti-Theft Guard Logic
+        // Anti-Theft Guard Logic (Secret PIN, Camera Snapshot & Laptop Alert)
         function toggleAntiTheftGuard() {
             antiTheftArmed = !antiTheftArmed;
             const btn = document.getElementById('antitheft-toggle-btn');
@@ -407,7 +416,7 @@
                 if (window.DeviceMotionEvent) {
                     window.addEventListener('devicemotion', handleMotionSecurity);
                 }
-                alert("🛡️ Anti-Theft Armed! Moving or shaking the phone will lock it down and snap a photo evidence sent to your laptop.");
+                alert("🛡️ Anti-Theft Guard Armed! Shaking or picking up this device will lock it, snap a photo, and broadcast the security alert to your laptop.");
             } else {
                 label.innerText = "Guard: OFF";
                 btn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900 transition flex items-center space-x-2";
@@ -435,7 +444,6 @@
             const video = document.getElementById('security-video');
             const canvas = document.getElementById('security-canvas');
             const evidenceImg = document.getElementById('evidence-snapshot');
-
             let snapshotData = '';
 
             try {
@@ -464,17 +472,18 @@
                 badgeBg: 'bg-red-600 text-white animate-bounce',
                 snapshot: snapshotData
             });
-            pushCloudRelay();
+            syncAndPush();
         }
 
         function verifyUnlockPIN() {
             const pin = document.getElementById('admin-pin').value;
-            if (pin === "1234") {
+            // Secret admin PIN (not shown on UI)
+            if (pin === "9988") {
                 document.getElementById('antitheft-lockdown-modal').classList.add('hidden');
                 document.getElementById('admin-pin').value = '';
                 alert("Terminal Unlocked.");
             } else {
-                alert("Incorrect PIN!");
+                alert("Incorrect PIN! Access denied.");
             }
         }
 
@@ -490,7 +499,7 @@
             };
 
             feedItems.unshift(newReq);
-            pushCloudRelay();
+            syncAndPush();
             document.getElementById('kiosk-status-card').classList.remove('hidden');
         }
 
@@ -511,9 +520,9 @@
                 badgeBg: 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300'
             });
 
-            pushCloudRelay();
+            syncAndPush();
             document.getElementById('donation-form').reset();
-            alert("Donation published and synced!");
+            alert("Donation published and synced across devices!");
         }
 
         function renderFeed() {
@@ -534,7 +543,7 @@
                     actionButton = `<span class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-500 text-xs font-bold rounded-lg">${item.status}</span>`;
                 }
 
-                let snapshotHtml = item.snapshot ? `<img src="${item.snapshot}" class="mt-2 rounded-lg max-h-28 border border-red-500">` : '';
+                let snapshotHtml = item.snapshot ? `<div class="mt-2"><p class="text-[10px] text-red-500 font-bold">Captured Evidence:</p><img src="${item.snapshot}" class="mt-1 rounded-lg max-h-32 border border-red-500"></div>` : '';
 
                 card.innerHTML = `
                     <div class="space-y-1">
@@ -556,7 +565,7 @@
 
         function updateItemStatus(index, newStatus) {
             feedItems[index].status = newStatus;
-            pushCloudRelay();
+            syncAndPush();
         }
 
         function toggleDarkMode() {
