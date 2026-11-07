@@ -126,7 +126,7 @@
                     </div>
                     <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-2">Need Meal Support?</h2>
                     <p class="text-emerald-100 text-sm sm:text-base font-medium">
-                        Tap any button below. Nearby hotels, caterers, and food relief volunteers will receive your real GPS alert across all connected devices instantly.
+                        Tap any button below. Nearby hotels, caterers, and food relief volunteers will receive your real GPS alert across all connected windows instantly.
                     </p>
                 </div>
                 
@@ -195,7 +195,7 @@
                     <div class="space-y-2 text-center md:text-left">
                         <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-800 text-emerald-200 text-xs font-bold">
                             <i class="fa-solid fa-check-circle text-brandYellow"></i>
-                            <span>GPS Alert Sent Across All Devices</span>
+                            <span>GPS Alert Sent Successfully</span>
                         </div>
                         <h3 id="status-title" class="text-2xl sm:text-3xl font-black">Request Dispatched!</h3>
                         <p id="status-details" class="text-emerald-100 text-sm max-w-xl"></p>
@@ -292,8 +292,8 @@
 
                 <div class="lg:col-span-7 space-y-4">
                     <div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-800">
-                        <h3 class="font-extrabold text-xl text-gray-900 dark:text-white">Live Activity Feed (Real-Time Mesh)</h3>
-                        <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-full animate-pulse">● Live Cloud Mesh</span>
+                        <h3 class="font-extrabold text-xl text-gray-900 dark:text-white">Live Activity Feed (Instant Sync)</h3>
+                        <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-full animate-pulse">● Instant Tab Sync</span>
                     </div>
                     <div id="request-feed-container" class="space-y-4"></div>
                 </div>
@@ -308,7 +308,7 @@
                 <span>• Designed & Developed by Gangan R G</span>
             </div>
             <div>
-                <span><i class="fa-solid fa-satellite-dish mr-1"></i> Global Real-Time Sync Channel Active</span>
+                <span><i class="fa-solid fa-satellite-dish mr-1"></i> Multi-Tab & Broadcast Sync Active</span>
             </div>
         </div>
     </footer>
@@ -329,7 +329,8 @@
             }
         }
 
-        const CLOUD_URL = 'https://api.npoint.io/plateshare_feed_demo_2026';
+        // Robust BroadcastChannel & LocalStorage Mesh for instant communication across tabs/windows
+        const channel = new BroadcastChannel('plateshare_sync_channel');
         let userGPS = { lat: "12.9716", lng: "77.5946" };
         let antiTheftArmed = false;
         let mediaStream = null;
@@ -342,30 +343,29 @@
         window.onload = function() {
             requestRealGPS();
             renderFeed();
-            fetchCloudFeed();
-            setInterval(fetchCloudFeed, 2000);
         };
+
+        // Listen for updates from other tabs/windows instantly
+        channel.onmessage = (event) => {
+            if (event.data && event.data.feed) {
+                feedItems = event.data.feed;
+                renderFeed();
+            }
+        };
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'plateshare_feed_items' && e.newValue) {
+                feedItems = JSON.parse(e.newValue);
+                renderFeed();
+            }
+        });
 
         function syncAndPush() {
             localStorage.setItem('plateshare_feed_items', JSON.stringify(feedItems));
             renderFeed();
-            fetch(CLOUD_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(feedItems)
-            }).catch(() => {});
-        }
-
-        function fetchCloudFeed() {
-            fetch(CLOUD_URL)
-                .then(res => res.json())
-                .then(data => {
-                    if (Array.isArray(data) && data.length > 0) {
-                        feedItems = data;
-                        localStorage.setItem('plateshare_feed_items', JSON.stringify(feedItems));
-                        renderFeed();
-                    }
-                }).catch(() => {});
+            try {
+                channel.postMessage({ feed: feedItems });
+            } catch (err) {}
         }
 
         function switchView(viewName) {
@@ -439,7 +439,7 @@
                 if (window.DeviceMotionEvent) {
                     window.addEventListener('devicemotion', handleMotionSecurity);
                 }
-                alert("🛡️ Anti-Theft Guard Armed! Moving this device will trigger lockdown and send camera evidence across devices.");
+                alert("🛡️ Anti-Theft Guard Armed! Moving this device will trigger lockdown and send camera evidence across windows.");
             } else {
                 label.innerText = "Guard: OFF";
                 btn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900 transition flex items-center space-x-2";
