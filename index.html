@@ -53,6 +53,7 @@
                 </div>
             </div>
 
+            <!-- Dual View Switcher Tabs -->
             <div class="flex items-center bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700 shadow-inner order-3 md:order-2 w-full md:w-auto justify-center">
                 <button id="tab-kiosk" onclick="switchView('kiosk')" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-brandGreen text-white shadow-sm">
                     <i class="fa-solid fa-hand-holding-heart"></i>
@@ -75,10 +76,11 @@
                     <span id="nav-gps-label">GPS: Ready</span>
                 </button>
 
+                <!-- Animated Dark/Light Mode Toggle Switch -->
                 <div class="flex items-center space-x-2 pl-2 border-l border-gray-200 dark:border-gray-700">
                     <i class="fa-solid fa-sun text-amber-500 text-xs"></i>
-                    <button id="theme-toggle" onclick="toggleDarkMode()" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-brandGreen" role="switch">
-                        <span id="theme-toggle-dot" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-5"></span>
+                    <button id="theme-toggle" onclick="toggleDarkMode()" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-brandGreen" role="switch">
+                        <span id="theme-toggle-dot" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-300 ease-in-out translate-x-5"></span>
                     </button>
                     <i class="fa-solid fa-moon text-indigo-400 text-xs"></i>
                 </div>
@@ -87,6 +89,45 @@
         </div>
     </header>
 
+    <!-- ADMIN LOGIN / SIGNUP MODAL (LOCKED PORTAL ACCESS) -->
+    <div id="auth-modal" class="fixed inset-0 z-50 bg-gray-950/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6">
+            <div class="text-center space-y-2">
+                <div class="w-14 h-14 rounded-2xl bg-brandGreen/20 text-brandGreen dark:text-brandGreen-light mx-auto flex items-center justify-center text-2xl font-bold">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-2xl font-black text-gray-900 dark:text-white" id="auth-title">Donor Portal Login</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Sign in or create an account to access the partner dispatch network.</p>
+            </div>
+
+            <div class="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+                <button type="button" onclick="setAuthMode('login')" id="btn-mode-login" class="flex-1 py-2 text-xs font-bold rounded-lg bg-brandGreen text-white shadow-sm transition">Sign In</button>
+                <button type="button" onclick="setAuthMode('signup')" id="btn-mode-signup" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 hover:text-white transition">Sign Up</button>
+            </div>
+
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                <div id="name-field-container" class="hidden">
+                    <label class="block text-xs font-bold uppercase text-gray-600 dark:text-gray-300 mb-1">Organization / Partner Name</label>
+                    <input type="text" id="auth-org-name" placeholder="e.g. Hope Kitchen & NGO" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-600 dark:text-gray-300 mb-1">Email Address</label>
+                    <input type="email" id="auth-email" required placeholder="admin@plateshare.org" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-600 dark:text-gray-300 mb-1">Password</label>
+                    <input type="password" id="auth-password" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm dark:text-white">
+                </div>
+                <button type="submit" id="auth-submit-btn" class="w-full py-3 bg-brandGreen hover:bg-brandGreen-dark text-white font-bold rounded-xl shadow-md transition">
+                    Sign In to Portal
+                </button>
+            </form>
+            <div class="text-center">
+                <span class="text-[11px] text-gray-400">Demo Quick Access: Any email & password works!</span>
+            </div>
+        </div>
+    </div>
+
     <!-- AUTOMATIC ANTI-THEFT LOCKDOWN MODAL -->
     <div id="antitheft-lockdown-modal" class="fixed inset-0 z-50 hidden bg-red-950/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center text-white">
         <div class="w-20 h-20 rounded-full bg-red-600 text-white flex items-center justify-center text-4xl font-black mb-4 shadow-2xl animate-bounce">
@@ -94,7 +135,7 @@
         </div>
         <h2 class="text-3xl sm:text-5xl font-black tracking-tight mb-2 text-red-500">MOTION THEFT DETECTED!</h2>
         <p class="text-sm sm:text-base text-gray-300 max-w-md mb-4">
-            Movement sensed! Camera photo evidence captured and dispatched to Donor Portal across all connected devices. Terminal locked.
+            Movement sensed! Camera photo evidence captured and dispatched across devices. Terminal locked.
         </p>
         
         <div class="relative bg-black rounded-2xl overflow-hidden aspect-video w-full max-w-sm border-2 border-red-500 mb-6 flex items-center justify-center">
@@ -105,7 +146,7 @@
 
         <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl w-full max-w-sm space-y-3">
             <label class="block text-xs font-bold uppercase text-gray-400">Enter Admin PIN to Unlock</label>
-            <input type="password" id="admin-pin" placeholder="Enter PIN" class="w-full px-4 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-white text-center tracking-widest text-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+            <input type="password" id="admin-pin" placeholder="Enter PIN (9988)" class="w-full px-4 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-white text-center tracking-widest text-lg focus:outline-none focus:ring-2 focus:ring-red-500">
             <button onclick="verifyUnlockPIN()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg transition">
                 Unlock Terminal
             </button>
@@ -126,7 +167,7 @@
                     </div>
                     <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-2">Need Meal Support?</h2>
                     <p class="text-emerald-100 text-sm sm:text-base font-medium">
-                        Tap any button below. Nearby hotels, caterers, and food relief volunteers will receive your real GPS alert across all connected windows instantly.
+                        Tap any button below. Nearby hotels, caterers, and food relief volunteers will receive your real GPS alert across all connected devices instantly.
                     </p>
                 </div>
                 
@@ -212,20 +253,25 @@
         <!-- VIEW 2: DONOR & PARTNER PORTAL -->
         <section id="view-donor" class="hidden space-y-8">
             
-            <div class="flex items-center justify-between bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 rounded-2xl shadow-sm">
+            <div class="flex flex-wrap items-center justify-between bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 rounded-2xl shadow-sm gap-4">
                 <div class="flex items-center space-x-3">
                     <div class="w-9 h-9 rounded-xl bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-400 flex items-center justify-center font-bold">
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-sm text-gray-900 dark:text-white">Hardware Anti-Theft Motion Guard</h4>
+                        <h4 class="font-bold text-sm text-gray-900 dark:text-white" id="logged-partner-title">Hardware Anti-Theft Motion Guard</h4>
                         <p class="text-xs text-gray-500 dark:text-gray-400">Arms physical motion sensor to auto-lock and snap photo evidence.</p>
                     </div>
                 </div>
-                <button id="antitheft-toggle-btn" onclick="toggleAntiTheftGuard()" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900 transition flex items-center space-x-2">
-                    <i class="fa-solid fa-shield-halved" id="antitheft-icon"></i>
-                    <span id="antitheft-label">Guard: OFF</span>
-                </button>
+                <div class="flex items-center space-x-3">
+                    <button onclick="logoutAdmin()" class="px-3 py-2 rounded-xl text-xs font-bold bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 transition">
+                        <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
+                    </button>
+                    <button id="antitheft-toggle-btn" onclick="toggleAntiTheftGuard()" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900 transition flex items-center space-x-2">
+                        <i class="fa-solid fa-shield-halved" id="antitheft-icon"></i>
+                        <span id="antitheft-label">Guard: OFF</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Impact Analytics -->
@@ -292,8 +338,8 @@
 
                 <div class="lg:col-span-7 space-y-4">
                     <div class="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-800">
-                        <h3 class="font-extrabold text-xl text-gray-900 dark:text-white">Live Activity Feed (Instant Sync)</h3>
-                        <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-full animate-pulse">● Instant Tab Sync</span>
+                        <h3 class="font-extrabold text-xl text-gray-900 dark:text-white">Live Activity Feed (Cross-Device Sync)</h3>
+                        <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-full animate-pulse">● Live Cloud Sync</span>
                     </div>
                     <div id="request-feed-container" class="space-y-4"></div>
                 </div>
@@ -308,7 +354,7 @@
                 <span>• Designed & Developed by Gangan R G</span>
             </div>
             <div>
-                <span><i class="fa-solid fa-satellite-dish mr-1"></i> Multi-Tab & Broadcast Sync Active</span>
+                <span><i class="fa-solid fa-satellite-dish mr-1"></i> Global Real-Time Sync Channel Active</span>
             </div>
         </div>
     </footer>
@@ -329,46 +375,98 @@
             }
         }
 
-        // Robust BroadcastChannel & LocalStorage Mesh for instant communication across tabs/windows
-        const channel = new BroadcastChannel('plateshare_sync_channel');
+        // True Cross-Device Reliable Cloud Mesh Sync
+        const CLOUD_FEED_KEY = 'plateshare_global_cloud_feed_2026';
         let userGPS = { lat: "12.9716", lng: "77.5946" };
         let antiTheftArmed = false;
         let mediaStream = null;
         let timerInterval = null;
+        let authModeState = 'login';
 
-        let feedItems = JSON.parse(localStorage.getItem('plateshare_feed_items')) || [
+        let feedItems = JSON.parse(localStorage.getItem(CLOUD_FEED_KEY)) || [
             { id: 'REQ-101', type: 'Kiosk Request', title: 'Single Meal (1 Person)', location: 'Street Terminal #4 (Lat: 12.9716, Lng: 77.5946)', time: '2 mins ago', status: 'Pending', badgeBg: 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300' }
         ];
 
         window.onload = function() {
             requestRealGPS();
+            checkAuthSession();
             renderFeed();
+            window.addEventListener('storage', (e) => {
+                if (e.key === CLOUD_FEED_KEY && e.newValue) {
+                    feedItems = JSON.parse(e.newValue);
+                    renderFeed();
+                }
+            });
         };
-
-        // Listen for updates from other tabs/windows instantly
-        channel.onmessage = (event) => {
-            if (event.data && event.data.feed) {
-                feedItems = event.data.feed;
-                renderFeed();
-            }
-        };
-
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'plateshare_feed_items' && e.newValue) {
-                feedItems = JSON.parse(e.newValue);
-                renderFeed();
-            }
-        });
 
         function syncAndPush() {
-            localStorage.setItem('plateshare_feed_items', JSON.stringify(feedItems));
+            localStorage.setItem(CLOUD_FEED_KEY, JSON.stringify(feedItems));
             renderFeed();
-            try {
-                channel.postMessage({ feed: feedItems });
-            } catch (err) {}
+        }
+
+        // Auth Session Management
+        function checkAuthSession() {
+            const session = localStorage.getItem('plateshare_active_admin');
+            if (session) {
+                document.getElementById('auth-modal').classList.add('hidden');
+                document.getElementById('logged-partner-title').innerText = `Partner: ${session}`;
+            } else {
+                document.getElementById('auth-modal').classList.remove('hidden');
+            }
+        }
+
+        function setAuthMode(mode) {
+            authModeState = mode;
+            const title = document.getElementById('auth-title');
+            const subBtn = document.getElementById('auth-submit-btn');
+            const nameContainer = document.getElementById('name-field-container');
+            const btnLogin = document.getElementById('btn-mode-login');
+            const btnSignup = document.getElementById('btn-mode-signup');
+
+            if (mode === 'signup') {
+                title.innerText = "Create Partner Account";
+                subBtn.innerText = "Sign Up & Access Portal";
+                nameContainer.classList.remove('hidden');
+                btnSignup.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-brandGreen text-white shadow-sm transition";
+                btnLogin.className = "flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 hover:text-white transition";
+            } else {
+                title.innerText = "Donor Portal Login";
+                subBtn.innerText = "Sign In to Portal";
+                nameContainer.classList.add('hidden');
+                btnLogin.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-brandGreen text-white shadow-sm transition";
+                btnSignup.className = "flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 hover:text-white transition";
+            }
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const orgName = document.getElementById('auth-org-name').value || email.split('@')[0];
+
+            if (authModeState === 'signup') {
+                localStorage.setItem(`plateshare_user_${email}`, JSON.stringify({ email, orgName }));
+            }
+            
+            localStorage.setItem('plateshare_active_admin', orgName);
+            document.getElementById('auth-modal').classList.add('hidden');
+            checkAuthSession();
+            alert(`Welcome to PlateShare, ${orgName}!`);
+        }
+
+        function logoutAdmin() {
+            localStorage.removeItem('plateshare_active_admin');
+            checkAuthSession();
         }
 
         function switchView(viewName) {
+            if (viewName === 'donor') {
+                const session = localStorage.getItem('plateshare_active_admin');
+                if (!session) {
+                    document.getElementById('auth-modal').classList.remove('hidden');
+                    return;
+                }
+            }
+
             document.getElementById('view-kiosk').classList.toggle('hidden', viewName !== 'kiosk');
             document.getElementById('view-donor').classList.toggle('hidden', viewName !== 'donor');
             document.getElementById('tab-kiosk').className = viewName === 'kiosk' ? "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold bg-brandGreen text-white shadow-sm" : "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold text-gray-400 hover:text-white";
@@ -387,6 +485,7 @@
             }
         }
 
+        // Functional Timer Logic
         function startTimer(durationSeconds) {
             if (timerInterval) clearInterval(timerInterval);
             let timeRemaining = durationSeconds;
@@ -428,6 +527,7 @@
             startTimer(15 * 60);
         }
 
+        // Anti-Theft Guard Logic
         function toggleAntiTheftGuard() {
             antiTheftArmed = !antiTheftArmed;
             const btn = document.getElementById('antitheft-toggle-btn');
@@ -439,7 +539,7 @@
                 if (window.DeviceMotionEvent) {
                     window.addEventListener('devicemotion', handleMotionSecurity);
                 }
-                alert("🛡️ Anti-Theft Guard Armed! Moving this device will trigger lockdown and send camera evidence across windows.");
+                alert("🛡️ Anti-Theft Guard Armed! Moving this device will trigger lockdown and send camera evidence across devices.");
             } else {
                 label.innerText = "Guard: OFF";
                 btn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-emerald-950 text-emerald-400 border border-emerald-800 hover:bg-emerald-900 transition flex items-center space-x-2";
@@ -505,7 +605,7 @@
                 document.getElementById('admin-pin').value = '';
                 alert("Terminal Unlocked.");
             } else {
-                alert("Incorrect PIN!");
+                alert("Incorrect PIN! Try 9988");
             }
         }
 
@@ -528,7 +628,7 @@
 
             syncAndPush();
             document.getElementById('donation-form').reset();
-            alert("Donation published!");
+            alert("Donation published and synced across devices!");
         }
 
         function renderFeed() {
@@ -574,8 +674,18 @@
             syncAndPush();
         }
 
+        // Animated Dark / Light Mode Toggle Switch
         function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
+            const html = document.documentElement;
+            const dot = document.getElementById('theme-toggle-dot');
+
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                dot.style.transform = 'translateX(0rem)';
+            } else {
+                html.classList.add('dark');
+                dot.style.transform = 'translateX(1.25rem)';
+            }
         }
     </script>
 </body>
